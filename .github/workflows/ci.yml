@@ -18,8 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runs-on: [self-hosted]
-        os: [windows-latest]
+        os: [self-hosted]
 #        os: [macos-latest, windows-latest]
         # 2022.1.0a12 removed until S.T.J issues fixed
 #        unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
