@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.os }}
+    name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -18,19 +18,30 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
-        unity-version: [2019.4.31f1]
+        os: [self-hosted]
+#        os: [macos-latest, windows-latest]
+        # 2022.1.0a12 removed until S.T.J issues fixed
+#        unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
+        unity-version: [2019.4.31f1, 2020.3.21f1]
         include:
-          # - os: windows-latest
-          #   unity-installation-path: C:/Program Files/Unity/
-          #   unity-root: C:/Program Files/Unity/Hub/Editor/
-          #   unity-path: Editor/
-          - os: macos-latest
-            unity-installation-path: /Applications/Unity/
-            unity-root: /Applications/Unity/Hub/Editor/
-            unity-path: Unity.app/Contents/MacOS
-          - unity-version: 2019.4.31f1
-            unity-version-changeset: bd5abf232a62
+          - os: windows-latest
+            unity-installation-path: C:/Program Files/Unity/
+            unity-root: C:/Program Files/Unity/Hub/Editor/
+            unity-path: Editor/
+            unity-config-path: C:/ProgramData/Unity/config/
+#          - os: macos-latest
+#            unity-installation-path: /Applications/Unity/
+#            unity-root: /Applications/Unity/Hub/Editor/
+#            unity-path: Unity.app/Contents/MacOS
+#            unity-config-path: /Library/Application Support/Unity/config/
+#          - unity-version: 2019.4.31f1
+#            unity-version-changeset: bd5abf232a62
+#          - unity-version: 2020.3.21f1
+#            unity-version-changeset: a38c86f6690f
+#          - unity-version: 2021.1.26f1
+#            unity-version-changeset: 6f076387c01d
+#          # - unity-version: 2022.1.0a12
+#          #   unity-version-changeset: 816252c3efbb
 
     steps:
       # Tag: 0.9.1
@@ -44,32 +55,32 @@ jobs:
         with:
           submodules: recursive
 
-      - name: "Set up Java: 11"
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-
-      # Unity is about 4GB in size and takes 20 minutes to download and install.
-      # Caching still takes some time, but brings it down to about 5 minutes.
-      - name: Restore cached Unity installation
-        id: cache-unity
-        uses: actions/cache@v2
-        with:
-          path: ${{ matrix.unity-installation-path }}
-          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}
-
-      - name: Restore previous build
-        uses: actions/cache@v2
-        with:
-          path: samples/artifacts/builds
-          # using hash of package.json to bust cache on release builds which modify it
-          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
-
+#      - name: "Set up Java: 11"
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 11
+#
+#      # Unity is about 4GB in size and takes 20 minutes to download and install.
+#      # Caching still takes some time, but brings it down to about 5 minutes.
+#      - name: Restore cached Unity installation
+#        id: cache-unity
+#        uses: actions/cache@v2
+#        with:
+#          path: ${{ matrix.unity-installation-path }}
+#          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}
+#
+#      - name: Restore previous build
+#        uses: actions/cache@v2
+#        with:
+#          path: samples/artifacts/builds
+#          # using hash of package.json to bust cache on release builds which modify it
+#          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
+#
       - name: Restore Unity Packages
         uses: actions/cache@v2
         with:
           path: samples/unity-of-bugs/Library
-          key: ${{ matrix.os }}-${{ hashFiles('samples/unity-of-bugs/Packages/packages-lock.json') }}
+          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('samples/unity-of-bugs/Packages/packages-lock.json') }}
 
       - name: Get submodule information
         run: |
@@ -87,7 +98,7 @@ jobs:
           # We only build the native SDKs if the respective 'package-dev/Plugins/' directories are empty
           # Output changes only depending on the git sha of the submodules
           # hash of package/package.json for cache busting on release builds (version bump)
-          key: ${{ matrix.os }}-${{ hashFiles('submodules-status') }}-${{ hashFiles('package/package.json') }}
+          key: ${{ matrix.os }}-${{ hashFiles('submodules-status') }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
 
       - name: Setup Unity
         uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
@@ -96,97 +107,87 @@ jobs:
           unity-version: ${{ matrix.unity-version }}
           unity-version-changeset:  ${{ matrix.unity-version-changeset }}
 
-      - name: Setup Unity Modules - Windows IL2CPP
-        if: matrix.os == 'windows-latest'
-        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
-        with:
-          unity-version: ${{ matrix.unity-version }}
-          unity-modules: windows-il2cpp
+#      - name: Setup Unity Modules - Windows IL2CPP
+#        if: matrix.os == 'windows-latest'
+#        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+#        with:
+#          unity-version: ${{ matrix.unity-version }}
+#          unity-modules: windows-il2cpp
+#
+#      - name: Setup Unity Modules - macOS IL2CPP
+#        if: matrix.os == 'macos-latest'
+#        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+#        with:
+#          unity-version: ${{ matrix.unity-version }}
+#          unity-modules: mac-il2cpp
+#
+#      - name: Setup Unity Modules - Android
+#        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+#        with:
+#          unity-version: ${{ matrix.unity-version }}
+#          unity-modules: android
+#
+#     - name: Setup Unity Modules - iOS
+#       uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+#       with:
+#         unity-version: ${{ matrix.unity-version }}
+#         unity-modules: ios
+#
+#      - name: Create Unity license config
+#        shell: pwsh
+#        run: |
+#          New-Item -Path '${{ matrix.unity-config-path }}' -ItemType Directory
+#          Set-Content -Path '${{ matrix.unity-config-path }}services-config.json' -Value '${{ secrets.UNITY_LICENSE_SERVER_CONFIG }}'
 
-      - name: Setup Unity Modules - macOS IL2CPP
-        if: matrix.os == 'macos-latest'
-        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
-        with:
-          unity-version: ${{ matrix.unity-version }}
-          unity-modules: mac-il2cpp
-
-      - name: Setup Unity Modules - Android
-        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
-        with:
-          unity-version: ${{ matrix.unity-version }}
-          unity-modules: android
-
-      - name: Setup Unity Modules - iOS
-        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
-        with:
-          unity-version: ${{ matrix.unity-version }}
-          unity-modules: ios
-
-      # Need to write to $GITHUB_PATH to make the environment variable available to other steps.
-      - name: Add Unity on PATH
-        shell: pwsh
-        run: |
-          Write-Output "${{ matrix.unity-root }}${{ matrix.unity-version }}/${{ matrix.unity-path }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      # Before we claim the license, lets build the SDKs which don't require Unity
-      - name: Build the sentry-cocoa SDK
-        run: dotnet msbuild /t:BuildCocoaSDK /p:Configuration=Release
-      - name: Build the sentry-java SDK
-        run: dotnet msbuild /t:BuildAndroidSDK /p:Configuration=Release
-
-      # License activation sometimes fails due to a problem connecting to Unity's licensing backend. Retry a few times if it fails.
-      - name: Activate Unity license
-        id: activate-license
-        shell: pwsh
-        # Builds take upwards of 30 min, so wait up to 10 for a license to be available before failing the build
-        run: |
-          $attempts = 40
-
-          while ($attempts -gt 0) {
-            unity -quit -batchmode -nographics -noUpm -logFile - -serial ${{ secrets.UNITY_SERIAL }} -username ${{ secrets.UNITY_EMAIL }} -password ${{ secrets.UNITY_PASSWORD }} | Out-Default
-
-            if ($LASTEXITCODE -eq 0) {
-              break
-            }
-
-            Write-Host "License activation failed. Retrying..."
-            Start-Sleep -Seconds 15
-            $attempts--
-          }
-
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "::error ::Failed to activate license after multiple attempts."
-          }
+ #     # Need to write to $GITHUB_PATH to make the environment variable available to other steps.
+ #     - name: Add Unity on PATH
+ #       shell: pwsh
+ #       run: |
+ #         Write-Output "${{ matrix.unity-root }}${{ matrix.unity-version }}/${{ matrix.unity-path }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Build Sentry.Unity Solution
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet build -c Release
 
       - name: Run Unity tests (playmode)
+        # TODO: Run Play mode tests on 2022 once S.T.J loading issue resolved.
+       # System.MissingMethodException : Method not found: System.Text.Json.JsonDocument System.Text.Json.JsonDocument.Parse(System.ReadOnlyMemory`1<byte>,System.Text.Json.JsonDocumentOptions)
+        if: ${{ matrix.unity-version != '2022.1.0a12' }}
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnityPlayModeTest /p:Configuration=Release
 
       - name: Run Unity tests (editmode)
+        # TODO: Run Edit mode tests on 2022 once S.T.J loading issue resolved.
+        # https://forum.unity.com/threads/unity-future-net-development-status.1092205/page-8#post-7602256
+        if: ${{ matrix.unity-version != '2022.1.0a12' }}
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnityEditModeTest /p:Configuration=Release
 
       - name: Build Android Player with IL2CPP
+        # TODO: Remove condition once path too long issue resolved:
+        # PathTooLongException: Path is too long. Path: C:\Program Files\Unity\Hub\Editor\2021.1.26f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\tempToolsDir\lib\monitor-x86\p2\org.eclipse.equinox.p2.engine\profileRegistry\DefaultProfile.profile\.data\org.eclipse.equinox.internal.p2.touchpoint.eclipse.actions
+        if: ${{ matrix.os != 'windows-latest' && matrix.unity-version != '2021.1.26f1' }}
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnityBuildPlayerAndroidIL2CPP /p:Configuration=Release
 
-      - name: Build iOS Player
-        if: matrix.os == 'macos-latest'
-        run: dotnet msbuild /t:UnityBuildPlayerIOS /p:Configuration=Release
-
+#      - name: Build iOS Player
+#        if: matrix.os == 'macos-latest'
+#        env:
+#          UNITY_VERSION: ${{ matrix.unity-version }}
+#        run: dotnet msbuild /t:UnityBuildPlayerIOS /p:Configuration=Release
+#
       - name: Build Standalone Player with IL2CPP
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnityBuildStandalonePlayerIL2CPP /p:Configuration=Release
 
-      # Last step that requires running Unity should be above this
-
-      # Professional licenses are per-seat so we should always try to return them
-      - name: Return Unity license
-        if: ${{ always() }}
-        shell: pwsh
-        run: |
-          unity -quit -batchmode -nographics -noUpm -logFile - -returnlicense | Out-Default
-
       - name: Run Smoke Tests
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnitySmokeTestStandalonePlayerIL2CPP
 
       - name: Prepare Sentry package for release
