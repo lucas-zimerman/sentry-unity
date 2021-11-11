@@ -203,18 +203,18 @@ jobs:
       - name: Setup Android Emulators
         if: matrix.os == 'self-hosted'
         uses: reactivecircus/android-emulator-runner@v2
-        force-avd-creation: false
-        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-        disable-animations: true
         env:
           UNITY_VERSION: ${{ matrix.unity-version }}
         with:
           name: Run Smoke Tests (Android)
           api-level: 29
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
           script: ./gradlew connectedCheck
           shell: pwsh
           run: ./scripts/smoke-test-droid.ps1      
-          
+
       - name: Prepare Sentry package for release
         shell: pwsh
         run: ./scripts/pack.ps1
