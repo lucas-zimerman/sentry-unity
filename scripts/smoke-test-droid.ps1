@@ -1,3 +1,4 @@
+Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/scripts")
 Set-Variable -Name "ApkFileName" -Value "app.apk"
 
 Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
@@ -28,12 +29,12 @@ else
     Write-Output "Found $deviceCount devices, they are $deviceList"
 }
 
-###test
+# Test
 foreach ($device in $deviceList)
 {
     Write-Output "Installing Apk on $device."
 
-    $stdout = ."$AdbPath/adb.exe" -s $device install -r $ApkFileName
+    $stdout = ."$AdbPath/adb.exe" -s $device install -r $ApkPath/$ApkFileName
     if($stdout -notcontains "Success")
     {
         Write-Error "Failed to Install APK: $stdout."
