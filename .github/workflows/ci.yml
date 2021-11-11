@@ -200,7 +200,7 @@ jobs:
           UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnitySmokeTestStandalonePlayerIL2CPP
 
-      - name: Run Smoke Tests (Android)
+      - name: Setup Android Emulators
         if: matrix.os == 'self-hosted'
         uses: reactivecircus/android-emulator-runner@v2
         api-level: [21]
@@ -211,8 +211,10 @@ jobs:
         disable-animations: true
         env:
           UNITY_VERSION: ${{ matrix.unity-version }}
-        shell: pwsh
-        run: ./scripts/smoke-test-droid.ps1
+        with:
+          name: Run Smoke Tests (Android)
+          shell: pwsh
+          run: ./scripts/smoke-test-droid.ps1
       
 
       - name: Prepare Sentry package for release
