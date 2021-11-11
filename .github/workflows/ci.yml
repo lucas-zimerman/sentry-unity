@@ -22,7 +22,7 @@ jobs:
 #        os: [macos-latest, windows-latest]
         # 2022.1.0a12 removed until S.T.J issues fixed
 #        unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
-        unity-version: [2019.4.31f1, 2020.3.21f1]
+        unity-version: [2019.4.31f1, 2020.3.20f1]
         include:
           - os: windows-latest
             unity-installation-path: C:/Program Files/Unity/
@@ -189,6 +189,12 @@ jobs:
         env:
           UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnitySmokeTestStandalonePlayerIL2CPP
+
+      - nane: Run Smoke Tests (Android)
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: ./scripts/smoke-test-droid.ps1
+      
 
       - name: Prepare Sentry package for release
         shell: pwsh
