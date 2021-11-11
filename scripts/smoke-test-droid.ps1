@@ -1,6 +1,6 @@
 # GITHUB_WORKSPACE is the root folder where the project is stored.
-Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/samples/artifacts/builds/Android/IL2CPP_Player")
-Set-Variable -Name "ApkFileName" -Value "app.apk"
+Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/samples/artifacts/builds/Android/")
+Set-Variable -Name "ApkFileName" -Value "IL2CPP_Player.apk"
 
 Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
 
