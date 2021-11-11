@@ -19,6 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [self-hosted]
+        api-level: [21]
 #        os: [macos-latest, windows-latest]
         # 2022.1.0a12 removed until S.T.J issues fixed
 #        unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
@@ -76,6 +77,15 @@ jobs:
 #          # using hash of package.json to bust cache on release builds which modify it
 #          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
 #
+      - name: AVD cache
+        uses: actions/cache@v2
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+
       - name: Restore Unity Packages
         uses: actions/cache@v2
         with:
@@ -191,8 +201,17 @@ jobs:
         run: dotnet msbuild /t:UnitySmokeTestStandalonePlayerIL2CPP
 
       - name: Run Smoke Tests (Android)
+        if: matrix.os == 'self-hosted'
+        uses: reactivecircus/android-emulator-runner@v2
+        api-level: [21]
+        target: [default, google_apis]
+        profile: Nexus 6
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
         env:
           UNITY_VERSION: ${{ matrix.unity-version }}
+        shell: pwsh
         run: ./scripts/smoke-test-droid.ps1
       
 
