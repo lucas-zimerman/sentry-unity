@@ -190,7 +190,7 @@ jobs:
           UNITY_VERSION: ${{ matrix.unity-version }}
         run: dotnet msbuild /t:UnitySmokeTestStandalonePlayerIL2CPP
 
-      - nane: Run Smoke Tests (Android)
+      - name: Run Smoke Tests (Android)
         env:
           UNITY_VERSION: ${{ matrix.unity-version }}
         run: ./scripts/smoke-test-droid.ps1
