@@ -58,9 +58,7 @@ jobs:
 
       - name: Setup Android Emulators
         if: matrix.os == 'macos-latest'
-        uses: reactivecircus/android-emulator-runner@v2
-        env:
-          UNITY_VERSION: ${{ matrix.unity-version }}
+        uses: reactivecircus/android-emulator-runner@9216c92cd9935b2aea47751a50e686a9c884b2dc
         with:
           name: Run Smoke Tests (Android)
           api-level: ${{ matrix.api-level }}
