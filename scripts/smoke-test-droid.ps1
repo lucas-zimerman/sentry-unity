@@ -1,5 +1,5 @@
 # GITHUB_WORKSPACE is the root folder where the project is stored.
-Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/script")
+Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/scripts")
 Set-Variable -Name "ApkFileName" -Value "app.apk"
 
 Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
