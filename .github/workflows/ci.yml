@@ -57,7 +57,7 @@ jobs:
           key: avd-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
-        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
+#        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
