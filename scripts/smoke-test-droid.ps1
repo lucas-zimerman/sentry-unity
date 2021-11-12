@@ -84,13 +84,10 @@ foreach ($device in $deviceList)
         else
         {
             $smokeTestId = (adb -s $device shell ps)
-            Write-Output " $smokeTestId VS "
 	    $smokeTestId = $smokeTestId | select-string $ActivityName
-            Write-Output " $smokeTestId "
-
         }
 
-        if ( $smokeTestId -eq $null)
+        if ($smokeTestId -eq $null)
         {
             $i = -2
         }
@@ -101,13 +98,13 @@ foreach ($device in $deviceList)
         }
     }
 
-    if ( $i -eq 0)
+    if ($i -eq 0)
     {
         Throw "Test Timeout"
     }
 
     $stdout = adb -s $device logcat -d  | select-string SMOKE
-    if ( $stdout -ne $null)
+    if ($stdout -ne $null)
     {
         Write-Output "$stdout"
     }
