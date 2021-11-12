@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }} - Android ${{  matrix.api-level }}
+    name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -19,7 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest]
-        api-level: [21, 23, 29]
         # 2022.1.0a12 removed until S.T.J issues fixed
         include:
           - os: macos-latest
@@ -60,7 +59,7 @@ jobs:
 #        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: ${{ matrix.api-level }}
+          api-level: "[21, 23, 29]"
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
