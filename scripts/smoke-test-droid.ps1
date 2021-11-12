@@ -53,7 +53,7 @@ foreach ($device in $deviceList)
     if ($stdout -like "*pidof*")
     {
         # Android devices older than 7.0
-        $IsRunningArg = "ps $ActivityName"
+        $IsRunningArg = "ps | select-string $ActivityName"
     }
     Write-Output "Checking apk activity with $IsRunningArg"
 
@@ -75,7 +75,8 @@ foreach ($device in $deviceList)
     adb -s $device shell am start -n $TestActivityName -e test smoke
 
     for ($i = 30; $i -gt 0; $i--) {
-	
+	adb -s $device shell ps
+        Write-Output "OR"
         $smokeTestId = adb -s $device shell $IsRunningArg
         Write-Output $smokeTestId
         if ( $smokeTestId -eq $null)
