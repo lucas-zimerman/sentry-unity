@@ -1,6 +1,6 @@
 # GITHUB_WORKSPACE is the root folder where the project is stored.
-Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/samples/artifacts/builds/Android")
-Set-Variable -Name "ApkFileName" -Value "IL2CPP_Player.apk"
+Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/script")
+Set-Variable -Name "ApkFileName" -Value "app.apk"
 
 Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
 
@@ -42,7 +42,7 @@ foreach ($device in $deviceList)
 {
     Write-Output "Installing Apk on $device."
 
-    $stdout = .adb -s $device install -r $ApkPath/$ApkFileName
+    $stdout = adb -s $device install -r $ApkPath/$ApkFileName
     if($stdout -notcontains "Success")
     {
         Write-Error "Failed to Install APK: $stdout."
@@ -51,16 +51,16 @@ foreach ($device in $deviceList)
 
     Write-Output "Clearing logcat from $device."
 
-    .adb -s $device logcat -c
+    adb -s $device logcat -c
 
     Write-Output "Starting Test..."
 
-    .adb -s $device shell am start -n io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity -e test smoke
+    adb -s $device shell am start -n io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity -e test smoke
 
     Start-Sleep -Seconds 2
 
     for ($i = 30; $i -gt 0; $i--) {
-        $smokeTestId = (& ".adb" '-s', $device, 'shell', 'pidof', 'io.sentry.samples.unityofbugs'  2>&1)
+        $smokeTestId = (& "adb" '-s', $device, 'shell', 'pidof', 'io.sentry.samples.unityofbugs'  2>&1)
         if ( $smokeTestId -eq $null)
         {
             $i = -2;
@@ -78,7 +78,7 @@ foreach ($device in $deviceList)
         exit(-1)
     }
 
-    $stdout = .adb  -s $device logcat -d  | findstr SMOKE
+    $stdout = adb  -s $device logcat -d  | findstr SMOKE
     if ( $stdout -ne $null)
     {
         Write-Output "$stdout"
@@ -86,7 +86,7 @@ foreach ($device in $deviceList)
     else
     {
         Write-Error "Smoke Test Failed, printing logcat..."
-        .adb -s $device logcat -d  | findstr "Unity unity sentry Sentry SMOKE"
+        adb -s $device logcat -d  | findstr "Unity unity sentry Sentry SMOKE"
         exit(-1)
     }
 }
