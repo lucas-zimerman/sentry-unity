@@ -4,18 +4,6 @@ Set-Variable -Name "ApkFileName" -Value "IL2CPP_Player.apk"
 
 Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
 
-# Check if APK was built.
-if (Test-Path -Path "$ApkPath/$ApkFileName" ) 
-{
-    Write-Output "Found $ApkPath/$ApkFileName"
-}
-else
-{
-    Write-Error "Expected APK on $ApkPath/$ApkFileName but it was not found."
-    exit(-1);
-}
-
-
 # Filter device List
 $RawAdbDeviceList = ."$AdbPath/adb.exe" devices
 $deviceList = @()
@@ -36,6 +24,17 @@ if ($deviceCount -eq 0)
 else
 {
     Write-Output "Found $deviceCount devices, they are $deviceList"
+}
+
+# Check if APK was built.
+if (Test-Path -Path "$ApkPath/$ApkFileName" ) 
+{
+    Write-Output "Found $ApkPath/$ApkFileName"
+}
+else
+{
+    Write-Error "Expected APK on $ApkPath/$ApkFileName but it was not found."
+    exit(-1);
 }
 
 # Test
