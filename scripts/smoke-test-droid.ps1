@@ -44,8 +44,12 @@ else
 # Test
 foreach ($device in $deviceList)
 {
+    $deviceSdk = adb shell getprop ro.build.version.sdk 
+    $deviceApi = adb shell getprop ro.build.version.release 
     Write-Output ""
+    Write-Output "Checking device $device with SDK $deviceSdk and API $deviceApi"
     Write-Output ""
+
     # Check Command Available for checking if App is running
     # Works with Android 7.0 and Higher
     $IsRunningArg = "New"
@@ -80,9 +84,13 @@ foreach ($device in $deviceList)
         else
         {
             $smokeTestId = (adb -s $device shell ps)
+            Write-Output " $smokeTestId VS "
+	    $smokeTestId = $smokeTestId | select-string $ActivityName
+            Write-Output " $smokeTestId "
+
         }
 
-        if ( $smokeTestId -eq $null -Or $smokeTestId -NotLike "*$ActivityName*")
+        if ( $smokeTestId -eq $null)
         {
             $i = -2
         }
