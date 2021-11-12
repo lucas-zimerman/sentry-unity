@@ -71,15 +71,15 @@ foreach ($device in $deviceList)
         $smokeTestId = (adb -s $device shell ps)
 	$smokeTestId = $smokeTestId | select-string $ActivityName
 
-        if ($smokeTestId -eq $null -And $checkStarted -eq 'False')
+        If ($smokeTestId -eq $null -And $checkStarted -eq 'False')
         {
             $i = -2
         }
-        else if($smokeTestId -ne $null -And $checkStarted -eq 'True')
+        ElseIf($smokeTestId -ne $null -And $checkStarted -eq 'True')
         {
             $checkStarted = 'False'
         }
-        else
+        Else
         {
             Write-Output "Waiting Process on $device to complete, waiting $i seconds"
             Start-Sleep -Seconds 1
