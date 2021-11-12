@@ -5,7 +5,7 @@ Set-Variable -Name "ApkFileName" -Value "IL2CPP_Player.apk"
 Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
 
 # Filter device List
-$RawAdbDeviceList = ."$AdbPath/adb.exe" devices
+$RawAdbDeviceList = .adb devices
 $deviceList = @()
 foreach ($device in $RawAdbDeviceList)
 {
@@ -42,7 +42,7 @@ foreach ($device in $deviceList)
 {
     Write-Output "Installing Apk on $device."
 
-    $stdout = ."$AdbPath/adb.exe" -s $device install -r $ApkPath/$ApkFileName
+    $stdout = .adb -s $device install -r $ApkPath/$ApkFileName
     if($stdout -notcontains "Success")
     {
         Write-Error "Failed to Install APK: $stdout."
@@ -51,16 +51,16 @@ foreach ($device in $deviceList)
 
     Write-Output "Clearing logcat from $device."
 
-    ."$AdbPath/adb.exe" -s $device logcat -c
+    .adb -s $device logcat -c
 
     Write-Output "Starting Test..."
 
-    ."$AdbPath/adb.exe" -s $device shell am start -n io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity -e test smoke
+    .adb -s $device shell am start -n io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity -e test smoke
 
     Start-Sleep -Seconds 2
 
     for ($i = 30; $i -gt 0; $i--) {
-        $smokeTestId = (& "$AdbPath/adb.exe" '-s', $device, 'shell', 'pidof', 'io.sentry.samples.unityofbugs'  2>&1)
+        $smokeTestId = (& ".adb" '-s', $device, 'shell', 'pidof', 'io.sentry.samples.unityofbugs'  2>&1)
         if ( $smokeTestId -eq $null)
         {
             $i = -2;
@@ -78,7 +78,7 @@ foreach ($device in $deviceList)
         exit(-1)
     }
 
-    $stdout = ."$AdbPath/adb.exe"  -s $device logcat -d  | findstr SMOKE
+    $stdout = .adb  -s $device logcat -d  | findstr SMOKE
     if ( $stdout -ne $null)
     {
         Write-Output "$stdout"
@@ -86,7 +86,7 @@ foreach ($device in $deviceList)
     else
     {
         Write-Error "Smoke Test Failed, printing logcat..."
-        ."$AdbPath/adb.exe" -s $device logcat -d  | findstr "Unity unity sentry Sentry SMOKE"
+        .adb -s $device logcat -d  | findstr "Unity unity sentry Sentry SMOKE"
         exit(-1)
     }
 }
