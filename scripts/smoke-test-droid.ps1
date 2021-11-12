@@ -51,8 +51,9 @@ foreach ($device in $deviceList)
     $IsRunningArg = "pidof $ActivityName"
     $stdout = adb -s $device shell $IsRunningArg 
     Write-Output $stdout
-    if ($stdout -contains "pidof: not found")
+    if ($stdout -contains "pidof")
     {
+        Write-Output "Yay contains pidof"
         # Android devices older than 7.0
         $IsRunningArg = "ps $ActivityName"
     }
