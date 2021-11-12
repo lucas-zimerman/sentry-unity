@@ -74,11 +74,10 @@ foreach ($device in $deviceList)
 
     adb -s $device shell am start -n $TestActivityName -e test smoke
 
-    Start-Sleep -Seconds 2
-
     for ($i = 30; $i -gt 0; $i--) {
 	
         $smokeTestId = adb -s $device shell $IsRunningArg
+        Write-Output $smokeTestId
         if ( $smokeTestId -eq $null)
         {
             $i = -2;
