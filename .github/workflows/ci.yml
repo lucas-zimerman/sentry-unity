@@ -62,7 +62,8 @@ jobs:
         with:          
           api-level: ${{ matrix.api-level }}
           disable-animations: true
-          
+          script: ./gradlew connectedCheck --stacktrace
+
       - name: Run Smoke Tests (Android)
         if: matrix.os == 'macos-latest'
         shell: pwsh
