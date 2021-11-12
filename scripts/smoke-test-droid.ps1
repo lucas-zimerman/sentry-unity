@@ -5,7 +5,7 @@ Set-Variable -Name "ApkFileName" -Value "IL2CPP_Player.apk"
 Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
 
 # Filter device List
-$RawAdbDeviceList = .adb devices
+$RawAdbDeviceList = adb devices
 $deviceList = @()
 foreach ($device in $RawAdbDeviceList)
 {
