@@ -52,12 +52,12 @@ foreach ($device in $deviceList)
 
     # Check Command Available for checking if App is running
     # Works with Android 7.0 and Higher
-    $IsRunningArg = "New"
-    $stdout = adb -s $device shell pidof $ActivityName
-    if ($stdout -like "*pidof*")
-    {
-        $IsRunningArg = "Old"
-    }
+#    $IsRunningArg = "New"
+#    $stdout = adb -s $device shell pidof $ActivityName
+#    if ($stdout -like "*pidof*")
+#    {
+#        $IsRunningArg = "Old"
+#    }
 
     $stdout = (adb -s $device install -r $ApkPath/$ApkFileName)
     if($stdout -notcontains "Success")
@@ -76,16 +76,16 @@ foreach ($device in $deviceList)
 
     for ($i = 30; $i -gt 0; $i--) {
 	
-        if ($IsRunningArg -eq "New")
-        {
-            # Android 7 and Higher
-            $smokeTestId = adb -s $device shell pidof $ActivityName
-        }
-        else
-        {
+#        if ($IsRunningArg -eq "New")
+#        {
+#            # Android 7 and Higher
+#            $smokeTestId = adb -s $device shell pidof $ActivityName
+#        }
+#        else
+#        {
             $smokeTestId = (adb -s $device shell ps)
 	    $smokeTestId = $smokeTestId | select-string $ActivityName
-        }
+#        }
 
         if ($smokeTestId -eq $null)
         {
