@@ -1,8 +1,6 @@
 # GITHUB_WORKSPACE is the root folder where the project is stored.
-Set-Variable -Name "ApkPath" -Value ($Env:GITHUB_WORKSPACE + "/scripts")
+Set-Variable -Name "ApkPath" -Value "scripts"
 Set-Variable -Name "ApkFileName" -Value "app.apk"
-
-Set-Variable -Name "AdbPath" -Value ($Env:ANDROID_HOME + "/platform-tools")
 
 # Filter device List
 $RawAdbDeviceList = adb devices
@@ -42,7 +40,7 @@ foreach ($device in $deviceList)
 {
     Write-Output "Installing Apk on $device."
 
-    $stdout = adb -s $device install -r $ApkPath/$ApkFileName
+    $stdout = (adb -s $device install -r $ApkPath/$ApkFileName)
     if($stdout -notcontains "Success")
     {
         Write-Error "Failed to Install APK: $stdout."
@@ -60,7 +58,8 @@ foreach ($device in $deviceList)
     Start-Sleep -Seconds 2
 
     for ($i = 30; $i -gt 0; $i--) {
-        $smokeTestId = (& "adb" '-s', $device, 'shell', 'pidof', 'io.sentry.samples.unityofbugs'  2>&1)
+	
+        $smokeTestId = adb -s $device shell pidof io.sentry.samples.unityofbugs
         if ( $smokeTestId -eq $null)
         {
             $i = -2;
@@ -78,7 +77,7 @@ foreach ($device in $deviceList)
         exit(-1)
     }
 
-    $stdout = adb  -s $device logcat -d  | findstr SMOKE
+    $stdout = adb -s $device logcat -d  | select-string SMOKE
     if ( $stdout -ne $null)
     {
         Write-Output "$stdout"
@@ -86,7 +85,7 @@ foreach ($device in $deviceList)
     else
     {
         Write-Error "Smoke Test Failed, printing logcat..."
-        adb -s $device logcat -d  | findstr "Unity unity sentry Sentry SMOKE"
+        adb -s $device logcat -d  | select-string "Unity|unity|sentry|Sentry|SMOKE"
         exit(-1)
     }
 }
