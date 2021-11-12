@@ -55,11 +55,41 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.api-level }}
 
-      - name: create AVD and run Smoke Test for Android
+      - name: create AVD and run Smoke Test for Android 21
 #        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: "[21, 23, 29]"
+          api-level: 21
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: pwsh ./scripts/smoke-test-droid.ps1
+
+      - name: create AVD and run Smoke Test for Android 23
+#        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 23
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: pwsh ./scripts/smoke-test-droid.ps1
+
+      - name: create AVD and run Smoke Test for Android 29
+#        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: pwsh ./scripts/smoke-test-droid.ps1
+
+      - name: create AVD and run Smoke Test for Android 30
+#        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
