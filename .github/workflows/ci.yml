@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }} - ${{  matrix.api-level }}
+    name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }} - Android ${{  matrix.api-level }}
     runs-on: ${{ matrix.os }}
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
