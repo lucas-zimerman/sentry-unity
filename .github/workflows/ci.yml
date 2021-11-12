@@ -58,12 +58,9 @@ jobs:
 
       - name: Setup Android Emulators
         if: matrix.os == 'macos-latest'
-        uses: @actions/core
-        uses: reactivecircus/android-emulator-runner@9216c92cd9935b2aea47751a50e686a9c884b2dc
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           name: Run Smoke Tests (Android)
           api-level: ${{ matrix.api-level }}
           disable-animations: true
-          script: ./gradlew connectedCheck --stacktrace
-          shell: pwsh
-          run: ./scripts/smoke-test-droid.ps1      
+          script: ./pwsh scripts/smoke-test-droid.ps1  
