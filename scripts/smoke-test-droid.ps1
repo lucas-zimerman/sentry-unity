@@ -100,6 +100,10 @@ foreach ($device in $deviceList)
 
     if ($i -eq 0)
     {
+	Write-Output "Logcat info."
+        adb -s $device logcat -d  | select-string "Unity|unity|sentry|Sentry|SMOKE"
+	Write-Output "PS info."
+        adb -s $device ps
         Throw "Test Timeout"
     }
 
