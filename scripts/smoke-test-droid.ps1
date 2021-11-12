@@ -82,7 +82,7 @@ foreach ($device in $deviceList)
             $smokeTestId = (adb -s $device shell ps)
         }
 
-        if ( $smokeTestId -eq $null -Or $smokeTestId -like "*$ActivityName*")
+        if ( $smokeTestId -eq $null -Or $smokeTestId -NotLike "*$ActivityName*")
         {
             $i = -2
         }
