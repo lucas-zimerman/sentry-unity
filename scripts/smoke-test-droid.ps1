@@ -1,6 +1,14 @@
 # GITHUB_WORKSPACE is the root folder where the project is stored.
+Write-Output "#################################################"
+Write-Output "#   ANDROID                                     #"
+Write-Output "#            VALIDATOR                          #"
+Write-Output "#                       SCRIPT                  #"
+Write-Output "#################################################"
+
 Set-Variable -Name "ApkPath" -Value "scripts"
 Set-Variable -Name "ApkFileName" -Value "app.apk"
+Set-Variable -Name "ActivityName" -Value "io.sentry.samples.unityofbugs"
+Set-Variable -Name "TestActivityName" -Value "io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity"
 
 # Filter device List
 $RawAdbDeviceList = adb devices
@@ -16,12 +24,11 @@ $deviceCount = $deviceList.Count
 
 if ($deviceCount -eq 0)
 {
-    Write-Error "It seems like no devices were found $RawAdbDeviceList"
-    exit(-1)
+    Throw "It seems like no devices were found $RawAdbDeviceList"
 }
 else
 {
-    Write-Output "Found $deviceCount devices, they are $deviceList"
+    Write-Output "Found $deviceCount devices: $deviceList"
 }
 
 # Check if APK was built.
@@ -31,19 +38,31 @@ if (Test-Path -Path "$ApkPath/$ApkFileName" )
 }
 else
 {
-    Write-Error "Expected APK on $ApkPath/$ApkFileName but it was not found."
-    exit(-1);
+    Throw "Expected APK on $ApkPath/$ApkFileName but it was not found."
 }
 
 # Test
 foreach ($device in $deviceList)
 {
+    Write-Output ""
+    Write-Output ""
+    # Check Command Available for checking if App is running
+    # Works with Android 7.0 and Higher
+    $IsRunningArg = "pidof $ActivityName"
+    $stdout = adb -s $device shell $IsRunningArg 
+    if ($stdout -contains "pidof: not found")
+    {
+        # Android devices older than 7.0
+        $IsRunningArg = "ps $ActivityName"
+    }
+    Write-Output "Checking apk activity with $IsRunningArg"
+
     Write-Output "Installing Apk on $device."
 
     $stdout = (adb -s $device install -r $ApkPath/$ApkFileName)
     if($stdout -notcontains "Success")
     {
-        Write-Error "Failed to Install APK: $stdout."
+        Throw "Failed to Install APK: $stdout."
         exit(-1)
     }
 
@@ -53,28 +72,27 @@ foreach ($device in $deviceList)
 
     Write-Output "Starting Test..."
 
-    adb -s $device shell am start -n io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity -e test smoke
+    adb -s $device shell am start -n $TestActivityName -e test smoke
 
     Start-Sleep -Seconds 2
 
     for ($i = 30; $i -gt 0; $i--) {
 	
-        $smokeTestId = adb -s $device shell pidof io.sentry.samples.unityofbugs
+        $smokeTestId = adb -s $device shell $IsRunningArg
         if ( $smokeTestId -eq $null)
         {
             $i = -2;
         }
         else
         {
-            Write-Output "Proccess $smokeTestId still running on $device, waiting $i seconds"
+            Write-Output "Process still running on $device, waiting $i seconds"
             Start-Sleep -Seconds 1
         }
     }
 
-    if ( $i -eq -2)
+    if ( $i -eq 0)
     {
-        Write-Error "Test Timeout"
-        exit(-1)
+        Throw "Test Timeout"
     }
 
     $stdout = adb -s $device logcat -d  | select-string SMOKE
@@ -84,11 +102,9 @@ foreach ($device in $deviceList)
     }
     else
     {
-        Write-Error "Smoke Test Failed, printing logcat..."
         adb -s $device logcat -d  | select-string "Unity|unity|sentry|Sentry|SMOKE"
-        exit(-1)
+        Throw "Smoke Test Failed."
     }
 }
 
 Write-Output "Test completed."
-exit(0)
