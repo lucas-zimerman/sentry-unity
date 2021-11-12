@@ -19,7 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest]
-        api-level: [21]
+        api-level: [21, 23, 29]
+        target: [default, google_apis]
         # 2022.1.0a12 removed until S.T.J issues fixed
         include:
           - os: macos-latest
@@ -56,11 +57,12 @@ jobs:
             ~/.android/adb*
           key: avd-${{ matrix.api-level }}
 
-      - name: create AVD and generate snapshot for caching
+      - name: create AVD and run Smoke Test for Android
 #        if: matrix.os == 'macos-latest' && steps.avd-cache.outputs.cache-hit != 'true'        
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
