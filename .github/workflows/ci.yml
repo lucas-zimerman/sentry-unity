@@ -189,7 +189,7 @@ jobs:
         run: dotnet msbuild /t:UnitySmokeTestStandalonePlayerIL2CPP
       
       - name: Preparing test app for smoke test.
-      - uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: droid-testapp-${{ matrix.unity-version }}
           path: samples/artifacts/builds/Android/IL2CPP_Player.apk
