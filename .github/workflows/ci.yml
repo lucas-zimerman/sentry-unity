@@ -75,8 +75,8 @@ jobs:
               name: droid-cache-${{ matrix.unity-version }}
               path: scripts
 
-         - name: Display structure of downloaded files
-           run: ls -R *.apk
+         - name: Extract zip file
+           run: 7z x scripts/droid-cache-${{ matrix.unity-version }} -o./scripts
 
          - name: Retrieve New APK File
            run: |
