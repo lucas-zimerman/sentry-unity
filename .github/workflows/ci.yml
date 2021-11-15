@@ -47,6 +47,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
 
   android-tests:
+      needs: [build]
       name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }}
       runs-on: macos-latest
       strategy:
