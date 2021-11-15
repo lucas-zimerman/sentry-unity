@@ -58,8 +58,6 @@ jobs:
            with:
              java-version: 8
          - uses: burrunan/gradle-cache-action@v1
-           with:
-             build-root-directory: tinylog-android-tests
          - uses: reactivecircus/android-emulator-runner@v2
            with:
              api-level: ${{ matrix.api-level }}
