@@ -76,7 +76,8 @@ jobs:
               path: scripts
 
          - name: Extract zip file
-           run: 7z x scripts/droid-cache-${{ matrix.unity-version }} -o./scripts
+           shell: pwsh
+           run: ls -R scripts
 
          - name: Retrieve New APK File
            run: |
