@@ -53,7 +53,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: droid-cache-${{ matrix.unity-version }}
-          path: scripts/${{ matrix.unity-version-changeset }}app2.apk
+          path: scripts/${{ matrix.unity-version }}app2.apk
 
   android-tests:
       needs: [build]
@@ -75,7 +75,7 @@ jobs:
               name: droid-cache-${{ matrix.unity-version }}
          - name: Retrieve New APK File
            run: |
-             cp "scripts/${{ matrix.unity-version-changeset }}app2.apk" "scripts/app2.apk"
+             cp "scripts/${{ matrix.unity-version }}app2.apk" "scripts/app2.apk"
               
          - uses: reactivecircus/android-emulator-runner@v2
            with:
