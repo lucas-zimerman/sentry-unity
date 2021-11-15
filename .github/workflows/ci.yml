@@ -18,11 +18,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
-        unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
+        os: [macos-latest, windows-latest]
         # 2022.1.0a12 removed until S.T.J issues fixed
+        unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
         include:
+          - os: windows-latest
+            unity-installation-path: C:/Program Files/Unity/
+            unity-root: C:/Program Files/Unity/Hub/Editor/
+            unity-path: Editor/
+            unity-config-path: C:/ProgramData/Unity/config/
           - os: macos-latest
+            unity-installation-path: /Applications/Unity/
+            unity-root: /Applications/Unity/Hub/Editor/
+            unity-path: Unity.app/Contents/MacOS
+            unity-config-path: /Library/Application Support/Unity/config/
+          - unity-version: 2019.4.31f1
+            unity-version-changeset: bd5abf232a62
+          - unity-version: 2020.3.21f1
+            unity-version-changeset: a38c86f6690f
+          - unity-version: 2021.1.26f1
+            unity-version-changeset: 6f076387c01d
+          # - unity-version: 2022.1.0a12
+          #   unity-version-changeset: 816252c3efbb
+
     steps:
       # Tag: 0.9.1
       - name: Cancel Previous Runs
@@ -40,59 +58,213 @@ jobs:
         with:
           java-version: 11
 
+      # Unity is about 4GB in size and takes 20 minutes to download and install.
+      # Caching still takes some time, but brings it down to about 5 minutes.
+      - name: Restore cached Unity installation
+        id: cache-unity
+        uses: actions/cache@v2
+        with:
+          path: ${{ matrix.unity-installation-path }}
+          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}
+
       - name: Restore previous build
         uses: actions/cache@v2
         with:
           path: samples/artifacts/builds
           # using hash of package.json to bust cache on release builds which modify it
           key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
-      - name: Create New APK File
-        run: |
-          cp "scripts/app.apk" "scripts/${{ matrix.unity-version }}app2.apk"
 
+      - name: Restore Unity Packages
+        uses: actions/cache@v2
+        with:
+          path: samples/unity-of-bugs/Library
+          key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('samples/unity-of-bugs/Packages/packages-lock.json') }}
+
+      - name: Get submodule information
+        run: |
+          git submodule status > submodules-status
+          cat submodules-status
+
+      - name: Restore native SDKs
+        uses: actions/cache@v2
+        with:
+          # The raw NDK symbols are needed to get bundled for the final craft artifact
+          path: |
+            package-dev/Plugins/iOS
+            package-dev/Plugins/Android
+            src/sentry-java/sentry-android-ndk/build/intermediates/merged_native_libs/release/out/lib
+          # We only build the native SDKs if the respective 'package-dev/Plugins/' directories are empty
+          # Output changes only depending on the git sha of the submodules
+          # hash of package/package.json for cache busting on release builds (version bump)
+          key: ${{ matrix.os }}-${{ hashFiles('submodules-status') }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
+
+      - name: Setup Unity
+        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+        id: setup-unity
+        with:
+          unity-version: ${{ matrix.unity-version }}
+          unity-version-changeset:  ${{ matrix.unity-version-changeset }}
+
+      - name: Setup Unity Modules - Windows IL2CPP
+        if: matrix.os == 'windows-latest'
+        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+        with:
+          unity-version: ${{ matrix.unity-version }}
+          unity-modules: windows-il2cpp
+
+      - name: Setup Unity Modules - macOS IL2CPP
+        if: matrix.os == 'macos-latest'
+        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+        with:
+          unity-version: ${{ matrix.unity-version }}
+          unity-modules: mac-il2cpp
+
+      - name: Setup Unity Modules - Android
+        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+        with:
+          unity-version: ${{ matrix.unity-version }}
+          unity-modules: android
+
+      - name: Setup Unity Modules - iOS
+        uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
+        with:
+          unity-version: ${{ matrix.unity-version }}
+          unity-modules: ios
+
+      - name: Create Unity license config
+        shell: pwsh
+        run: |
+          New-Item -Path '${{ matrix.unity-config-path }}' -ItemType Directory
+          Set-Content -Path '${{ matrix.unity-config-path }}services-config.json' -Value '${{ secrets.UNITY_LICENSE_SERVER_CONFIG }}'
+
+      # Need to write to $GITHUB_PATH to make the environment variable available to other steps.
+      - name: Add Unity on PATH
+        shell: pwsh
+        run: |
+          Write-Output "${{ matrix.unity-root }}${{ matrix.unity-version }}/${{ matrix.unity-path }}" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build Sentry.Unity Solution
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: dotnet build -c Release
+
+      - name: Run Unity tests (playmode)
+        # TODO: Run Play mode tests on 2022 once S.T.J loading issue resolved.
+       # System.MissingMethodException : Method not found: System.Text.Json.JsonDocument System.Text.Json.JsonDocument.Parse(System.ReadOnlyMemory`1<byte>,System.Text.Json.JsonDocumentOptions)
+        if: ${{ matrix.unity-version != '2022.1.0a12' }}
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: dotnet msbuild /t:UnityPlayModeTest /p:Configuration=Release
+
+      - name: Run Unity tests (editmode)
+        # TODO: Run Edit mode tests on 2022 once S.T.J loading issue resolved.
+        # https://forum.unity.com/threads/unity-future-net-development-status.1092205/page-8#post-7602256
+        if: ${{ matrix.unity-version != '2022.1.0a12' }}
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: dotnet msbuild /t:UnityEditModeTest /p:Configuration=Release
+
+      - name: Build Android Player with IL2CPP
+        # TODO: Remove condition once path too long issue resolved:
+        # PathTooLongException: Path is too long. Path: C:\Program Files\Unity\Hub\Editor\2021.1.26f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\tempToolsDir\lib\monitor-x86\p2\org.eclipse.equinox.p2.engine\profileRegistry\DefaultProfile.profile\.data\org.eclipse.equinox.internal.p2.touchpoint.eclipse.actions
+        if: ${{ matrix.os != 'windows-latest' && matrix.unity-version != '2021.1.26f1' }}
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: dotnet msbuild /t:UnityBuildPlayerAndroidIL2CPP /p:Configuration=Release
+
+      - name: Build iOS Player
+        if: matrix.os == 'macos-latest'
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: dotnet msbuild /t:UnityBuildPlayerIOS /p:Configuration=Release
+
+      - name: Build Standalone Player with IL2CPP
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: dotnet msbuild /t:UnityBuildStandalonePlayerIL2CPP /p:Configuration=Release
+
+      - name: Run Smoke Tests
+        env:
+          UNITY_VERSION: ${{ matrix.unity-version }}
+        run: dotnet msbuild /t:UnitySmokeTestStandalonePlayerIL2CPP
+      
+      - name: Preparing test app for smoke test.
       - uses: actions/upload-artifact@v2
         with:
-          name: droid-cache-${{ matrix.unity-version }}
-          path: scripts/${{ matrix.unity-version }}app2.apk
+          name: droid-testapp-${{ matrix.unity-version }}
+          path: samples/artifacts/builds/Android/IL2CPP_Player.apk
 
-  android-tests:
-      needs: [build]
-      name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }} - Android ${{ matrix.api-level }}
-      runs-on: macos-latest
-      strategy:
-        matrix:
-           api-level: [21, 26, 29]
-           unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
-      steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-java@v1
-           with:
-             java-version: 11
-         - uses: burrunan/gradle-cache-action@v1
+      - name: Prepare Sentry package for release
+        shell: pwsh
+        run: ./scripts/pack.ps1
 
-         - uses: actions/download-artifact@v2
-           with:
-              name: droid-cache-${{ matrix.unity-version }}
-              path: scripts
+      - name: Upload build artifacts if build failed
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Build output
+          path: artifacts/build
 
-         - uses: actions/download-artifact@v2
-           with:
-              name: droid-cache-${{ matrix.unity-version }}
-              path: scripts/bob
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.sha }}
+          # Adding the native libraries so the symbol collector craft target can find/upload them
+          path: |
+            package-release.zip
+            src/sentry-java/sentry-android-ndk/build/intermediates/merged_native_libs/release/out/lib/*
 
-         - name: Extract zip file
-           shell: pwsh
-           run: ls -R scripts
+      - name: Upload Android Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: Android Build
+          path: samples/artifacts/builds/Android
 
-         - name: Retrieve New APK File
-           run: |
-             cp "scripts/${{ matrix.unity-version }}app2.apk" "scripts/app2.apk"
-              
-         - uses: reactivecircus/android-emulator-runner@v2
-           with:
-             api-level: ${{ matrix.api-level }}
-             force-avd-creation: false
-             emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-             disable-animations: false
-             script: pwsh ./scripts/smoke-test-droid.ps1
-  
+      - name: Upload test artifacts (playmode)
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test results (playmode)
+          path: artifacts/test/playmode
+
+      - name: Upload test artifacts (editmode)
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test results (editmode)
+          path: artifacts/test/editmode
+
+  android-smoke-test:
+    needs: [build]
+    name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }} - Android ${{ matrix.api-level }} smoke tests 
+    runs-on: macos-latest
+    strategy:
+      matrix:
+         api-level: [15, 18, 21, 26, 29]
+         # 2021.1.26f1 is not being generated.
+         unity-version: [2019.4.31f1, 2020.3.21f1]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.3
+    
+      - name: Download test app artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: droid-testapp-${{ matrix.unity-version }}
+          path: samples/artifacts/builds/Android
+
+      - name: AVD cache
+        uses: actions/cache@v2
+        id: avd-cache
+        with:
+            path: |
+         	  ~/.android/avd/*
+         	  ~/.android/adb*
+            key: avd-${{ matrix.api-level }}-${{ matrix.unity-version }}
+
+      - name: Smoke test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+         api-level: ${{ matrix.api-level }}
+         force-avd-creation: false
+         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+         disable-animations: false
+         script: pwsh ./scripts/smoke-test-droid.ps1
