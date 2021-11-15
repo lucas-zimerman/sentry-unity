@@ -50,6 +50,11 @@ jobs:
         run: |
           cp "scripts/app.apk" "scripts/app2.apk"
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: droid-cache-${{ matrix.unity-version }}
+          path: scripts/app2.apk
+
   android-tests:
       needs: [build]
       name: Unity ${{ matrix.unity-version }} - ${{ matrix.os }} - Android ${{ matrix.api-level }}
@@ -64,6 +69,11 @@ jobs:
            with:
              java-version: 11
          - uses: burrunan/gradle-cache-action@v1
+
+         - uses: actions/download-artifact@v2
+           with:
+              name: droid-cache-${{ matrix.unity-version }}
+              
          - uses: reactivecircus/android-emulator-runner@v2
            with:
              api-level: ${{ matrix.api-level }}
