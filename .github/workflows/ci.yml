@@ -46,7 +46,7 @@ jobs:
       - name: Preparing test app for smoke test.
         uses: actions/upload-artifact@v2
         with:
-          name: droid-testapp-${{ matrix.unity-version }}
+          name: droid-testapp-aa
           path: scripts/app2.apk
 
   android-smoke-test:
@@ -65,7 +65,7 @@ jobs:
       - name: Download test app artifact
         uses: actions/download-artifact@v2
         with:
-          name: droid-testapp-${{ matrix.unity-version }}
+          name: droid-testapp-aa
           path: scripts
 
       - name: AVD cache
