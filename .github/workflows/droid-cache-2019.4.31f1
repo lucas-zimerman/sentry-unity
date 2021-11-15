@@ -73,6 +73,11 @@ jobs:
          - uses: actions/download-artifact@v2
            with:
               name: droid-cache-${{ matrix.unity-version }}
+              path: scripts
+
+         - name: Display structure of downloaded files
+           run: ls -R *.apk
+
          - name: Retrieve New APK File
            run: |
              cp "scripts/${{ matrix.unity-version }}app2.apk" "scripts/app2.apk"
