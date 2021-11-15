@@ -6,7 +6,7 @@ Write-Output "#                       SCRIPT                  #"
 Write-Output "#################################################"
 
 Set-Variable -Name "ApkPath" -Value "scripts"
-Set-Variable -Name "ApkFileName" -Value "app.apk"
+Set-Variable -Name "ApkFileName" -Value "app2.apk"
 Set-Variable -Name "ActivityName" -Value "io.sentry.samples.unityofbugs"
 Set-Variable -Name "TestActivityName" -Value "io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity"
 
