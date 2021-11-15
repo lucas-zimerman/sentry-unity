@@ -49,7 +49,6 @@ jobs:
       - name: Create New APK File
         run: |
           cp "scripts/app.apk" "scripts/app2.apk"
-          done
 
   android-tests:
       needs: [build]
