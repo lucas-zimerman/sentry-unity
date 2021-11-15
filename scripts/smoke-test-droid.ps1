@@ -10,6 +10,9 @@ Set-Variable -Name "ApkFileName" -Value "app2.apk"
 Set-Variable -Name "ActivityName" -Value "io.sentry.samples.unityofbugs"
 Set-Variable -Name "TestActivityName" -Value "io.sentry.samples.unityofbugs/com.unity3d.player.UnityPlayerActivity"
 
+Write-Outpuut "Files on script folder..."
+ls scripts/
+
 # Filter device List
 $RawAdbDeviceList = adb devices
 $deviceList = @()
