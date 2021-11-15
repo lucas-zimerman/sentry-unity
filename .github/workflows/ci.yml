@@ -75,6 +75,11 @@ jobs:
               name: droid-cache-${{ matrix.unity-version }}
               path: scripts
 
+         - uses: actions/download-artifact@v2
+           with:
+              name: droid-cache-${{ matrix.unity-version }}
+              path: scripts/bob
+
          - name: Extract zip file
            shell: pwsh
            run: ls -R scripts
