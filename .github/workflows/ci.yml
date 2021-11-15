@@ -48,12 +48,12 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
       - name: Create New APK File
         run: |
-          cp "scripts/app.apk" "scripts/app2.apk"
+          cp "scripts/app.apk" "scripts/${{ matrix.unity-version-changeset }}app2.apk"
 
       - uses: actions/upload-artifact@v2
         with:
           name: droid-cache-${{ matrix.unity-version }}
-          path: scripts/app2.apk
+          path: scripts/${{ matrix.unity-version-changeset }}app2.apk
 
   android-tests:
       needs: [build]
