@@ -48,7 +48,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
       - name: Create New APK File
         run: |
-          cp "scripts/app.apk" "scripts/${{ matrix.unity-version-changeset }}app2.apk"
+          cp "scripts/app.apk" "scripts/${{ matrix.unity-version }}app2.apk"
 
       - uses: actions/upload-artifact@v2
         with:
