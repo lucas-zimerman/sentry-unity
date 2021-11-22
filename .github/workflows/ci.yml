@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest]
         # 2022.1.0a12 removed until S.T.J issues fixed
-        unity-version: [2019.4.31f1, 2020.3.21f1, 2021.1.26f1]
+        unity-version: [2019.4.31f1]
         include:
           - os: windows-latest
             unity-installation-path: C:/Program Files/Unity/
@@ -70,7 +70,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}-${{ matrix.unity-version }}
+          key: avd-${{ matrix.api-level }}-${{ matrix.unity-version }}-22
 
       - name: Smoke test
         uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330
@@ -102,7 +102,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}-${{ matrix.unity-version }}-gservices
+          key: avd-${{ matrix.api-level }}-${{ matrix.unity-version }}-gservices-22
 
       - name: Smoke test
         uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330
