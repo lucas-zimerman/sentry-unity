@@ -56,7 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-         api-level: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
+         api-level: [30]
          # 2021.1.26f1 is not being generated.
          unity-version: [2019.4.31f1, 2020.3.21f1]
     steps:
