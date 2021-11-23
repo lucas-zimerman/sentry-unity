@@ -54,7 +54,7 @@ jobs:
           submodules: recursive
 
       - name: "Set up Java: 11"
-        if matrix.os != 'self-hosted-windows'
+        if: matrix.os != 'self-hosted-windows'
         uses: actions/setup-java@v1
         with:
           java-version: 11
@@ -62,7 +62,7 @@ jobs:
       # Unity is about 4GB in size and takes 20 minutes to download and install.
       # Caching still takes some time, but brings it down to about 5 minutes.
       - name: Restore cached Unity installation
-        if matrix.os != 'self-hosted-windows'
+        if: matrix.os != 'self-hosted-windows'
         id: cache-unity
         uses: actions/cache@v2
         with:
@@ -70,7 +70,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}
 
       - name: Restore previous build
-        if matrix.os != 'self-hosted-windows'
+        if: matrix.os != 'self-hosted-windows'
         uses: actions/cache@v2
         with:
           path: samples/artifacts/builds
@@ -78,7 +78,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
 
       - name: Restore Unity Packages
-        if matrix.os != 'self-hosted-windows'
+        if: matrix.os != 'self-hosted-windows'
         uses: actions/cache@v2
         with:
           path: samples/unity-of-bugs/Library
@@ -103,7 +103,7 @@ jobs:
           key: ${{ matrix.os }}-${{ hashFiles('submodules-status') }}-${{ matrix.unity-version }}-${{ matrix.unity-version-changeset }}-${{ hashFiles('package/package.json') }}
 
       - name: Setup Unity
-        if matrix.os != 'self-hosted-windows'
+        if: matrix.os != 'self-hosted-windows'
         uses: kuler90/setup-unity@f44e3f35ce3737316a15321ec3468161940e23e8
         id: setup-unity
         with:
@@ -137,7 +137,7 @@ jobs:
           unity-modules: ios
 
       - name: Create Unity license config
-        if matrix.os != 'self-hosted-windows'
+        if: matrix.os != 'self-hosted-windows'
         shell: pwsh
         run: |
           New-Item -Path '${{ matrix.unity-config-path }}' -ItemType Directory
