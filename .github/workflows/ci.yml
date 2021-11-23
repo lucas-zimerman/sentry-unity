@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest]
         # 2022.1.0a12 removed until S.T.J issues fixed
         unity-version: [2019.4.31f1]
         include:
