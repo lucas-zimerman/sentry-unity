@@ -9,6 +9,7 @@ on:
   pull_request:
 
 jobs:
+    
   build:
     name: Unity
     runs-on: ${{ matrix.os }}
@@ -43,6 +44,19 @@ jobs:
 
     steps:
       # Tag: 0.9.1
+      - name: Test1
+        shell: pwsh
+        run: |
+          $env:unity_path2 = "ABC";
+          Write-Output "Unity path is $env:unity_path2"
+
+      - name: Test2
+        shell: pwsh
+        run: |
+          Write-Output "Unity path was $env:unity_path2"
+          $env:unity_path2 = "DEF";
+          Write-Output "Unity path is $env:unity_path2"
+        
       - name: Preparing test app for smoke test.
         uses: actions/upload-artifact@v2
         with:
