@@ -47,14 +47,14 @@ jobs:
       - name: Test1
         shell: pwsh
         run: |
-          $env:unity_path2 = "ABC";
+          echo "unity_path2=ABC" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
           Write-Output "Unity path is $env:unity_path2"
 
       - name: Test2
         shell: pwsh
         run: |
           Write-Output "Unity path was $env:unity_path2"
-          $env:unity_path2 = "DEF";
+          echo "unity_path2=DEF" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
           Write-Output "Unity path is $env:unity_path2"
         
       - name: Preparing test app for smoke test.
