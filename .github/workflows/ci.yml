@@ -19,15 +19,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [macos-latest]
         # 2022.1.0a12 removed until S.T.J issues fixed
         unity-version: [2019.4.31f1]
         include:
-          - os: windows-latest
-            unity-installation-path: C:/Program Files/Unity/
-            unity-root: C:/Program Files/Unity/Hub/Editor/
-            unity-path: Editor/
-            unity-config-path: C:/ProgramData/Unity/config/
           - os: macos-latest
             unity-installation-path: /Applications/Unity/
             unity-root: /Applications/Unity/Hub/Editor/
@@ -53,9 +48,7 @@ jobs:
       - name: Test2
         shell: pwsh
         run: |
-          Write-Output "Unity path was $env:unity_path2"
-          echo "unity_path2=DEF" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-          Write-Output "Unity path is $env:unity_path2"
+          xcrun simctl list devices
         
       - name: Preparing test app for smoke test.
         uses: actions/upload-artifact@v2
