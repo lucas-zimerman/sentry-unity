@@ -12,7 +12,7 @@ jobs:
     
   build:
     name: Unity
-    runs-on: windows-latest
+    runs-on: macos-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_NOLOGO: 1
@@ -20,22 +20,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest]
-        # 2022.1.0a12 removed until S.T.J issues fixed
-        unity-version: [2019.4.31f1]
-        include:
-          - os: macos-latest
-            unity-installation-path: /Applications/Unity/
-            unity-root: /Applications/Unity/Hub/Editor/
-            unity-path: Unity.app/Contents/MacOS
-            unity-config-path: /Library/Application Support/Unity/config/
-          - unity-version: 2019.4.31f1
-            unity-version-changeset: bd5abf232a62
-          - unity-version: 2020.3.21f1
-            unity-version-changeset: a38c86f6690f
-          - unity-version: 2021.1.26f1
-            unity-version-changeset: 6f076387c01d
-          # - unity-version: 2022.1.0a12
-          #   unity-version-changeset: 816252c3efbb
 
     steps:
       # Tag: 0.9.1
