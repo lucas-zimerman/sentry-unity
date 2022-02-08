@@ -36,6 +36,10 @@ jobs:
         shell: pwsh
         run: xcversion simulators --install='iOS 12.4'
 
+      - name: Install iOS 13.7 runtime
+        shell: pwsh
+        run: xcversion simulators --install='iOS 13.7'
+
       - name: Get list of devices
         shell: pwsh
         run: xcrun simctl list devices
