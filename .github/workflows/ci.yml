@@ -50,7 +50,7 @@ jobs:
 
       - name: Get list of devices
         shell: pwsh
-        run: xcrun simctl list devices
+        run: sudp xcrun simctl list devices
 
       - name: Test2
         shell: pwsh
