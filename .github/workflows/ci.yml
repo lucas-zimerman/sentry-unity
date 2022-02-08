@@ -36,6 +36,10 @@ jobs:
         shell: pwsh
         run: xcversion simulators --install='iOS 12.0'
 
+      - name: Create simulator
+        shell: pwsh
+        run: xcrun simctl create derp "iPhone 8" "iOS12.0"
+
       - name: Install iOS 12.4 runtime
         shell: pwsh
         run: xcversion simulators --install='iOS 12.4'
