@@ -28,7 +28,14 @@ jobs:
         run: |
           echo "unity_path2=C:\ bla bla" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
           Write-Output "Unity path is $env:unity_path2"
+      - name: Install xcode-installer
+        shell: pwsh
+        run: sudo gem install xcode-install
 
+      - name: Install iOS 12.4 runtime
+        shell: pwsh
+        run: xcversion simulators --install='iOS 12.4'
+        
       - name: Test2
         shell: pwsh
         run: |
