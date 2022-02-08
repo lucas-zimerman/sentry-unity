@@ -56,13 +56,13 @@ jobs:
         shell: pwsh
         run: xcrun simctl create derp "iPhone 8" "iOS13.0"
 
-      - name: Install iOS 14.0 runtime
-        shell: pwsh
-        run: xcversion simulators --install='iOS 14.0'
+#      - name: Install iOS 14.0 runtime
+#        shell: pwsh
+#        run: xcversion simulators --install='iOS 14.0'
 
-      - name: Create simulator
-        shell: pwsh
-        run: xcrun simctl create derp "iPhone 8" "iOS14.0"
+#      - name: Create simulator
+#        shell: pwsh
+ #       run: xcrun simctl create derp "iPhone 8" "iOS14.0"
 
       - name: Get list of devices
         shell: pwsh
