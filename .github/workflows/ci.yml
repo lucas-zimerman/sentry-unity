@@ -35,7 +35,11 @@ jobs:
       - name: Install iOS 12.4 runtime
         shell: pwsh
         run: xcversion simulators --install='iOS 12.4'
-        
+
+      - name: Get list of devices
+        shell: pwsh
+        run: xcrun simctl list devices
+
       - name: Test2
         shell: pwsh
         run: |
