@@ -34,29 +34,29 @@ jobs:
         shell: pwsh
         run: gem install xcode-install
 
-      - name: Install iOS 12.0 runtime
+      - name: Install iOS 14.0 runtime
         shell: pwsh
-        run: xcversion simulators --install='iOS 12.0'
+        run: xcversion simulators --install='iOS 14.0'
 
       - name: Create simulator
         shell: pwsh
-        run: xcrun simctl create derp "iPhone 8" "iOS12.0"
+        run: xcrun simctl create derp "iPhone 8" "iOS14.0"
 
-      - name: Install iOS 12.4 runtime
+      - name: Install iOS 14.1 runtime
         shell: pwsh
-        run: xcversion simulators --install='iOS 12.4'
-
-      - name: Create simulator
-        shell: pwsh
-        run: xcrun simctl create derp "iPhone 8" "iOS12.4"
-
-      - name: Install iOS 13.0 runtime
-        shell: pwsh
-        run: xcversion simulators --install='iOS 13.0'
+        run: xcversion simulators --install='iOS 14.1'
 
       - name: Create simulator
         shell: pwsh
-        run: xcrun simctl create derp "iPhone 8" "iOS13.0"
+        run: xcrun simctl create derp "iPhone 8" "iOS14.1"
+
+      - name: Install iOS 14.2 runtime
+        shell: pwsh
+        run: xcversion simulators --install='iOS 14.2'
+
+      - name: Create simulator
+        shell: pwsh
+        run: xcrun simctl create derp "iPhone 9" "iOS14.2"
 
 #      - name: Install iOS 14.0 runtime
 #        shell: pwsh
