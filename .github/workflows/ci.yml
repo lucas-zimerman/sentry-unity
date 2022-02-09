@@ -20,51 +20,22 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest]
-        testt: [ 1.0, "1.0"]
+        testt: [ "14.1", "14.2", "14.3"]
          
 
     steps:
       # Tag: 0.9.1
-      - name: Test1
-        shell: pwsh
-        run: |
-          echo "unity_path2=C:\ bla bla" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
-          Write-Output "Unity path is $env:unity_path2"
       - name: Install xcode-installer
         shell: pwsh
         run: gem install xcode-install
 
-      - name: Install iOS 14.0 runtime
+      - name: Install iOS ${{ matrix.testt}} runtime
         shell: pwsh
-        run: xcversion simulators --install='iOS 14.0'
+        run: xcversion simulators --install='iOS ${{ matrix.testt }}'
 
       - name: Create simulator
         shell: pwsh
-        run: xcrun simctl create derp "iPhone 8" "iOS14.0"
-
-      - name: Install iOS 14.1 runtime
-        shell: pwsh
-        run: xcversion simulators --install='iOS 14.1'
-
-      - name: Create simulator
-        shell: pwsh
-        run: xcrun simctl create derp "iPhone 8" "iOS14.1"
-
-      - name: Install iOS 14.2 runtime
-        shell: pwsh
-        run: xcversion simulators --install='iOS 14.2'
-
-      - name: Create simulator
-        shell: pwsh
-        run: xcrun simctl create derp "iPhone 9" "iOS14.2"
-
-#      - name: Install iOS 14.0 runtime
-#        shell: pwsh
-#        run: xcversion simulators --install='iOS 14.0'
-
-#      - name: Create simulator
-#        shell: pwsh
- #       run: xcrun simctl create derp "iPhone 8" "iOS14.0"
+        run: xcrun simctl create derp "iPhone 8" "iOS${{ matrix.testt }}"
 
       - name: Get list of devices
         shell: pwsh
