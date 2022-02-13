@@ -35,13 +35,12 @@ jobs:
           {
             $avdTarget = "google_apis"
           }
-          Write-Output 'AVD is $avdTarget'
-          echo ::set-output $avdTarget
-
+          Write-Output "AVD is $avdTarget"
+          return $avdTarget
       - name: Select AVD target 2
         shell: pwsh
         run: |
-          Write-Output 'Target Value is  ${{ steps.smoke-test-avd-target.outputs.value }}'    
+          Write-Output "Target Value is  ${{ steps.smoke-test-avd-target.outputs.value }} OR ${{ steps.smoke-test-avd-target.outputs }} OR ${{ steps.smoke-test-avd-target }}"
           Throw "test"
       
       - name: Install xcode-installer
