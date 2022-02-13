@@ -30,9 +30,14 @@ jobs:
         id: smoke-test-avd-target
         shell: pwsh
         run: |
-          $avdTarget = ${{ matrix.api-level }} == 30 ? "google_apis" : "default"
+          $avdTarget = "default"
+          If (${{ matrix.api-level }} -eq 30)
+          {
+            $avdTarget = "google_apis"
+          }
           Write-Output 'AVD is $avdTarget'
           return $avdTarget
+
 
       - name: Select AVD target 2
         shell: pwsh
