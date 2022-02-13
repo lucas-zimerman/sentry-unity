@@ -35,7 +35,8 @@ jobs:
           {
             $avdTarget = "google_apis"
           }
-          Write-Host "::set-output name=target::$avdTarget" | echo
+          Write-Host "steps.select-avd-target.outputs.target is $avdTarget" 
+          echo "::set-output name=target::$avdTarget"
 
       - name: Select AVD target 2
         shell: pwsh
