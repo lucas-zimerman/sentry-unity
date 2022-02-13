@@ -21,10 +21,24 @@ jobs:
       matrix:
         os: [macos-latest]
         testt: [ "14.1", "14.2", "14.3"]
+        api-level: [21, 25, 30]
          
 
     steps:
       # Tag: 0.9.1
+      - name: Select AVD target
+        id: smoke-test-avd-target
+        shell: pwsh
+        run: |
+          $avdTarget = ${{ matrix.api-level }} == 30 ? "google_apis" : "default"
+          Write-Output 'AVD is $avdTarget'
+          return $avdTarget
+
+      - name: Select AVD target 2
+        shell: pwsh
+        run: |
+          Write-Output 'Target Value is  ${{ steps.smoke-test-avd-target.outputs.value }}'    
+      
       - name: Install xcode-installer
         shell: pwsh
         run: gem install xcode-install
