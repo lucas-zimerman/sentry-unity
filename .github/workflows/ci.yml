@@ -27,7 +27,7 @@ jobs:
     steps:
       # Tag: 0.9.1
       - name: Select AVD target
-        id: smoke-test-avd-target
+        id: select-avd-target
         shell: pwsh
         run: |
           $avdTarget = "default"
@@ -35,12 +35,12 @@ jobs:
           {
             $avdTarget = "google_apis"
           }
-          Write-Output "AVD is $avdTarget"
-          return $avdTarget
+          Write-Output "::set-output name=target::$avdTarget" | echo
+
       - name: Select AVD target 2
         shell: pwsh
         run: |
-          Write-Output "Target Value is  ${{ steps.smoke-test-avd-target.outputs.value }} OR ${{ steps.smoke-test-avd-target.outputs }} OR ${{ steps.smoke-test-avd-target }}"
+          Write-Output "Target Value is  ${{ steps.select-avd-target.outputs.target }} OR ${{ steps.select-avd-target.target }} OR ${{ steps.select-avd-target.outputs.target.value }}"
           Throw "test"
       
       - name: Install xcode-installer
