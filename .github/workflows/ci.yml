@@ -31,7 +31,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "Smoke test failed with status ${{ steps.smoke-test.outputs.smoke-status }}, closing simulator."
-          Start-Process -FilePath "adb" -ArgumentList "emu", "kill"
+          adb emu kill
           sleep 7
       
       - name: Select AVD target
