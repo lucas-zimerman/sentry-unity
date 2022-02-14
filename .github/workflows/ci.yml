@@ -27,11 +27,12 @@ jobs:
     steps:
       # Tag: 0.9.1
       - name: Kill emulator if AVD failed.
-        continue-on-error: true
         if: ${{ steps.smoke-test.outputs.smoke-status != 'Completed' }}
+        shell: pwsh
         run: |
-          adb emu kill
-          sleep 7     
+          Write-Host "Smoke test failed with status ${{ steps.smoke-test.outputs.smoke-status }}, closing simulator."
+          Start-Process -FilePath "adb" -ArgumentList "emu", "kill"
+          sleep 7
       
       - name: Select AVD target
         id: select-avd-target
