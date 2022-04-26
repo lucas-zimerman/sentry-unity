@@ -27,6 +27,17 @@ jobs:
     steps:
       # Tag: 0.9.1
       
+      - name: Check latest version
+        if: ${{ matrix.api-level == latest }}
+        shell: pwsh
+        run : |
+          $response = (Invoke-WebRequest -UseBasicParsing -Uri "https://developer.android.com/studio/releases/platforms").Content
+          $result = [regex]::Match($response, " \(API level (?<model>\d+)\)")
+          $latestNumber = $result.Groups["model"].Value
+          Write-Output "Latest API is $latestNumber"
+          echo "::set-output name=matrix.api-level::$latestNumber"
+
+      
       - name: Android emulator setup + Smoke test
         id: smoke-test
         continue-on-error: true
