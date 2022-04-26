@@ -28,7 +28,7 @@ jobs:
       # Tag: 0.9.1
       
       - name: Check latest version
-        if: ${{ matrix.api-level == latest }}
+        if: ${{ matrix.api-level == 'latest' }}
         shell: pwsh
         run : |
           $response = (Invoke-WebRequest -UseBasicParsing -Uri "https://developer.android.com/studio/releases/platforms").Content
