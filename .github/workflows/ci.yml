@@ -29,7 +29,6 @@ jobs:
       
       - name: Choose API Level
         id: droid-api
-        if: ${{ matrix.api-level == 'latest' }}
         shell: pwsh
         run : |
           if ( ${{ matrix.api-level }} -eq 'latest') 
