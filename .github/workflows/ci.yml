@@ -21,21 +21,30 @@ jobs:
       matrix:
         os: [macos-latest]
         testt: [ "14.1", "14.2", "14.3"]
-        api-level: [21, 25, 31, 32, latest]
+        api-level: [21, 25, 31, latest]
          
 
     steps:
       # Tag: 0.9.1
       
-      - name: Check latest version
+      - name: Choose API Level
+        id: droid-api
         if: ${{ matrix.api-level == 'latest' }}
         shell: pwsh
         run : |
-          $response = (Invoke-WebRequest -UseBasicParsing -Uri "https://developer.android.com/studio/releases/platforms").Content
-          $result = [regex]::Match($response, " \(API level (?<model>\d+)\)")
-          $latestNumber = $result.Groups["model"].Value
-          Write-Output "Latest API is $latestNumber"
-          echo "::set-output name=matrix.api-level::$latestNumber"
+          if ( ${{ matrix.api-level }} -eq 'latest') 
+          {
+            $response = (Invoke-WebRequest -UseBasicParsing -Uri "https://developer.android.com/studio/releases/platforms").Content
+            $result = [regex]::Match($response, " \(API level (?<model>\d+)\)")
+            $latestNumber = $result.Groups["model"].Value
+            Write-Output "Latest API is ${{ matrix.api-level }}"
+            echo "::set-output name=level::${{ matrix.api-level }}"
+          }
+          else 
+          {
+            Write-Output "Current API is $latestNumber"
+            echo "::set-output name=matrix.api-level::$latestNumber"
+          }
 
       
       - name: Android emulator setup + Smoke test
@@ -44,12 +53,12 @@ jobs:
         timeout-minutes: 30
         uses: reactivecircus/android-emulator-runner@2b2ebf2e518e38a17180117fc2b677006db27330
         with:
-          api-level: ${{ matrix.api-level }}
+          api-level: ${{ steps.droi-api.outputs.level }}
           #api-level 30 image is only available with google services.
-          target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
+          target: ${{ steps.droi-api.outputs.level >= 30 && 'google_apis' || 'default' }}
           force-avd-creation: false
           ram-size: 2048M
-          arch: ${{ matrix.api-level >= 30 && 'x86_64' || 'x86' }}
+          arch: ${{ steps.droi-api.outputs.level >= 30 && 'x86_64' || 'x86' }}
           cores: 2
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -69,7 +78,7 @@ jobs:
         shell: pwsh
         run: |
           $avdTarget = "default"
-          If (${{ matrix.api-level }} -eq 30)
+          If (${{ steps.droi-api.outputs.level }} -eq 30)
           {
             $avdTarget = "google_apis"
           }
