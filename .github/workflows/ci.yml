@@ -38,7 +38,7 @@ jobs:
           target: ${{ matrix.api-level >= 30 && 'google_apis' || 'default' }}
           force-avd-creation: false
           ram-size: 2048M
-          arch: ${{ matrix.api-level >= 30 && 'x86_x64' || 'x86' }}
+          arch: ${{ matrix.api-level >= 30 && 'x86_64' || 'x86' }}
           cores: 2
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
