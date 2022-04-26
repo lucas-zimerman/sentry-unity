@@ -61,7 +61,7 @@ jobs:
           cores: 2
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
-          script: sudo pwsh ./scripts/smoke-test-droid.ps1
+          script: sudo pwsh scripts/smoke-test-droid.ps1
 
 
       - name: Kill emulator if AVD failed.
