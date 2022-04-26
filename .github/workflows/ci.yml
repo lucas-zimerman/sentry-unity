@@ -50,7 +50,6 @@ jobs:
         shell: pwsh
         run: |
           Write-Output "Target Value is  ${{ steps.select-avd-target.outputs.target }} OR ${{ steps.select-avd-target.target }} OR ${{ steps.select-avd-target.outputs.target.value }}"
-          Throw "test"
       
       - name: Install xcode-installer
         shell: pwsh
