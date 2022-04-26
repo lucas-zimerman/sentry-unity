@@ -21,7 +21,7 @@ jobs:
       matrix:
         os: [macos-latest]
         testt: [ "14.1", "14.2", "14.3"]
-        api-level: [21, 25, 30]
+        api-level: [21, 25, 31, 32, latest]
          
 
     steps:
