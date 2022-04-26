@@ -46,7 +46,7 @@ jobs:
           }
 
       
-      - name: Android emulator setup + Smoke test
+      - name: Android emulator setup + Smoke test ${{ steps.droid-api.outputs.level }}
         id: smoke-test
         continue-on-error: true
         timeout-minutes: 30
