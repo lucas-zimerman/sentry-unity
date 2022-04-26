@@ -11,7 +11,7 @@ on:
 jobs:
     
   build:
-    name: Unity ${{matrix.testt}}
+    name: Unity ${{matrix.testt}} droid ${{matrix.api-level}}
     runs-on: macos-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
