@@ -31,7 +31,7 @@ jobs:
         id: droid-api
         shell: pwsh
         run : |
-          if ( ${{ matrix.api-level }} -eq 'latest') 
+          if ( '${{ matrix.api-level }}' -eq 'latest') 
           {
             $response = (Invoke-WebRequest -UseBasicParsing -Uri "https://developer.android.com/studio/releases/platforms").Content
             $result = [regex]::Match($response, " \(API level (?<model>\d+)\)")
@@ -41,8 +41,8 @@ jobs:
           }
           else 
           {
-            Write-Output "Current API is $latestNumber"
-            echo "::set-output name=matrix.api-level::$latestNumber"
+            Write-Output "Current API is ${{ matrix.api-level }}"
+            echo "::set-output name=matrix.api-level::${{ matrix.api-level }}"
           }
 
       
