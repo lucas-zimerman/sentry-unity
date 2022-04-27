@@ -27,6 +27,7 @@ jobs:
     steps:
       # Tag: 0.9.1
       
+      # outputs variabled: version-label, api-level, target, arch
       - name: Configure Android Settings
         id: droid-settings
         shell: pwsh
@@ -50,11 +51,11 @@ jobs:
           }
           
           # Setup Arch and Target
-          $target = $apiLevel -he 30 ? 'google_apis' : 'default'
+          $target = $apiLevel -ge 30 ? 'google_apis' : 'default'
           Write-Output "Current Target is $target"
           echo "::set-output name=target::$target"
           
-          $arch = $apiLevel -he 30 ? 'x86_64' : 'x86'
+          $arch = $apiLevel -ge 30 ? 'x86_64' : 'x86'
           Write-Output "Current Arch is $arch"
           echo "::set-output name=arch::$arch"
           
