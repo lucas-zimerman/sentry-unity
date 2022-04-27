@@ -27,37 +27,53 @@ jobs:
     steps:
       # Tag: 0.9.1
       
-      - name: Choose API Level
-        id: droid-api
+      - name: Configure Android Settings
+        id: droid-settings
         shell: pwsh
         run : |
-          if ( '${{ matrix.api-level }}' -eq 'latest') 
+          # Setup API Level
+          $apiLevel = ${{ matrix.api-level }}
+          if ( '$apiLevel' -eq 'latest') 
           {
             $response = (Invoke-WebRequest -UseBasicParsing -Uri "https://developer.android.com/studio/releases/platforms").Content
             $result = [regex]::Match($response, " \(API level (?<model>\d+)\)")
-            $latestNumber = $result.Groups["model"].Value
+            $apiLevel = $result.Groups["model"].Value
             Write-Output "Latest API is $latestNumber"
-            echo "::set-output name=level::$latestNumber"
+            echo "::set-output name=api-level::$apiLevel"
+            echo "::set-output name=version-label::$arch (latest)"
           }
           else 
           {
-            Write-Output "Current API is ${{ matrix.api-level }}"
-            echo "::set-output name=level::${{ matrix.api-level }}"
+            Write-Output "Current API is $apiLevel"
+            echo "::set-output name=api-level::$apiLevel"
+            echo "::set-output name=version-label::$arch"
           }
+          
+          # Setup Arch and Target
+          $target = $apiLevel -he 30 ? 'google_apis' : 'default'
+          Write-Output "Current Target is $target"
+          echo "::set-output name=target::$target"
+          
+          $arch = $apiLevel -he 30 ? 'x86_64' : 'x86'
+          Write-Output "Current Arch is $arch"
+          echo "::set-output name=arch::$arch"
+          
+          
+          
 
       
-      - name: Android emulator setup + Smoke test ${{ steps.droid-api.outputs.level }}
+      - name: Smoke test + Android emulator setup API ${{ steps.droid-settings.outputs.version-label }}
         id: smoke-test
         continue-on-error: true
         timeout-minutes: 30
         uses: reactivecircus/android-emulator-runner@76c2bf6f95ed6458fd659a1bdb680a0f8df232dc
         with:
-          api-level: ${{ steps.droid-api.outputs.level }}
+          api-level: ${{ steps.droid-settings.outputs.api-level }}
           #api-level 30 image is only available with google services.
-          target: ${{ steps.droid-api.outputs.level >= 30 && 'google_apis' || 'default' }}
+          target: ${{ steps.droid-settings.outputs.target }}
           force-avd-creation: false
           ram-size: 2048M
-          arch: ${{ steps.droid-api.outputs.level >= 30 && 'x86_64' || 'x86' }}
+          arch: ${{ steps.droid-settings.outputs.arch }}
           cores: 2
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
