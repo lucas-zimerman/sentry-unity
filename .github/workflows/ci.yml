@@ -39,9 +39,9 @@ jobs:
             $response = (Invoke-WebRequest -UseBasicParsing -Uri "https://developer.android.com/studio/releases/platforms").Content
             $result = [regex]::Match($response, " \(API level (?<model>\d+)\)")
             $apiLevel = $result.Groups["model"].Value
-            Write-Output "Latest API is $latestNumber"
+            Write-Output "Latest API is $apiLevel"
             echo "::set-output name=api-level::$apiLevel"
-            echo "::set-output name=version-label::$arch (latest)"
+            echo "::set-output name=version-label::$apiLevel (latest)"
           }
           else 
           {
