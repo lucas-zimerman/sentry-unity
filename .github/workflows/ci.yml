@@ -33,6 +33,9 @@ jobs:
         shell: pwsh
         run : |
           # Setup API Level
+          Write-Host "Test" -BackgroundColor Gray
+          Write-Host "te" -ForegroundColor Green
+          Write-Host "te" -ForegroundColor Green -BackgroundColor Gray
           $apiLevel = '${{ matrix.api-level }}'
           if ( $apiLevel -eq 'latest') 
           {
