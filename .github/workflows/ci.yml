@@ -33,7 +33,7 @@ jobs:
         shell: pwsh
         run : |
           # Setup API Level
-          Write-Host ":group::Test group 1"
+          Write-Host "::group::Test group 1"
           Write-Host "bla"
           Write-Host "bla"
           Write-Host "bla"
