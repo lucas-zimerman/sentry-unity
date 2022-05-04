@@ -33,13 +33,14 @@ jobs:
         shell: pwsh
         run : |
           # Setup API Level
+          
           echo "::group::Test group 1"
           Write-Host "bla"
           Write-Host "bla"
           Write-Host "bla"
           Write-Host "bla"
           Write-Host "bla"
-          echo ""::endgroup::"
+          echo "::endgroup::"
           Write-Host "Test" -BackgroundColor Gray
           Write-Host "te" -ForegroundColor Green
           Write-Host "te" -ForegroundColor Green -BackgroundColor Gray
