@@ -33,11 +33,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: test
-        id: my-step
-        run: |
-          "status=failure" >> $env:GITHUB_OUTPUT
-
       # Not required for MacOS.
       - name: Enable KVM group perms
         if: steps.avd-cache.outputs.cache-hit == '2true'
@@ -54,7 +49,6 @@ jobs:
 
       # outputs variables: api-level, label, target
       - name: Configure Android Settings
-        if: steps.avd-cache.outputs.cache-hit == '2true'
         id: config
         run: |
           # Setup API Level
@@ -88,71 +82,70 @@ jobs:
 #      - name: Setup Android SDK
 #        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
 
-#      - name: AVD cache
-#        uses: actions/cache@v4
-#        id: avd-cache
-#        with:
-#          path: |
-#            ~/.android/avd/
-#            $ANDROID_SDK_ROOT/system-images/
-#          key: avd-${{ runner.os }}-${{ steps.config.outputs.api-level }}-${{ github.run_id }}
+      - name: AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/
+            $ANDROID_SDK_ROOT/system-images/
+          key: avd-${{ runner.os }}-${{ steps.config.outputs.api-level }}-${{ github.run_id }}
 
-#      - name: create Android Emulator Image
-#        if: steps.avd-cache.outputs.cache-hit != 'true'
-#        uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
-#        with:
-#          api-level: ${{ steps.config.outputs.api-level }}
-#          target: ${{ steps.config.outputs.target }}
-#          force-avd-creation: false
-#          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-#          disable-animations: false
-#          arch: x86_64
-#          script: |
-#            adb wait-for-device
-#            adb shell input keyevent 82
-#            adb devices -l
-#            # gradle connectedAndroidTest --continue
-#            echo "Generated AVD snapshot for caching."
+      - name: create Android Emulator Image
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
+        with:
+          api-level: ${{ steps.config.outputs.api-level }}
+          target: ${{ steps.config.outputs.target }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          arch: x86_64
+          script: |
+            adb wait-for-device
+            adb shell input keyevent 82
+            adb devices -l
+            # gradle connectedAndroidTest --continue
+            echo "Generated AVD snapshot for caching."
 
-#      - name: Wait for Emulator to Close
-#        env:
-#          EMULATOR_NAME: emulator-5554 # Replace with your emulator ID
-#        run: |
-#          Write-Output "Waiting for emulator $env:EMULATOR_NAME to close..."
-#          $retries = 0
-#          $maxRetries = 60 # Adjust timeout (60 x 5 seconds = 5 minutes)
-#          while ($true) {
-#              $devices = adb devices | Select-String -Pattern $env:EMULATOR_NAME
-#              if (-not $devices) {
-#                  Write-Output "Emulator $env:EMULATOR_NAME is offline."
-#                  break
-#              }
-#              if ($retries -ge $maxRetries) {
-#                  Write-Error "Timeout: Emulator $env:EMULATOR_NAME did not go offline after $(($maxRetries * 5)) seconds."
-#                  exit 1
-#              }
-#              Write-Output "Emulator $env:EMULATOR_NAME is still running. Retrying in 5 seconds... ($retries/$maxRetries)"
-#              Start-Sleep -Seconds 5
-#              $retries++
-#          }
+      - name: Wait for Emulator to Close
+        env:
+          EMULATOR_NAME: emulator-5554 # Replace with your emulator ID
+        run: |
+          Write-Output "Waiting for emulator $env:EMULATOR_NAME to close..."
+          $retries = 0
+          $maxRetries = 60 # Adjust timeout (60 x 5 seconds = 5 minutes)
+          while ($true) {
+              $devices = adb devices | Select-String -Pattern $env:EMULATOR_NAME
+              if (-not $devices) {
+                  Write-Output "Emulator $env:EMULATOR_NAME is offline."
+                  break
+              }
+              if ($retries -ge $maxRetries) {
+                  Write-Error "Timeout: Emulator $env:EMULATOR_NAME did not go offline after $(($maxRetries * 5)) seconds."
+                  exit 1
+              }
+              Write-Output "Emulator $env:EMULATOR_NAME is still running. Retrying in 5 seconds... ($retries/$maxRetries)"
+              Start-Sleep -Seconds 5
+              $retries++
+          }
 
-#      - name: Android API ${{ steps.config.outputs.label }} Smoke test
-#        uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
-#        id: smoke-test
-#        timeout-minutes: 40
-#        continue-on-error: true
-#        with:
-#          api-level: ${{ steps.config.outputs.api-level }}
-#          target: ${{ steps.config.outputs.target }}
-#          force-avd-creation: false
-#          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-#          disable-animations: true
-#          script: pwsh ./scripts/smoke-test-android.ps1 -IsIntegrationTest -WarnIfFlaky
-
-#      - name: Upload artifacts on failure
-#        if: ${{ failure() }}
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: testapp-android-logs-${{ inputs.api-level }}-${{ inputs.unity-version }}-${{ inputs.try }}
-#          path: ${{ env.ARTIFACTS_PATH }}
-#          retention-days: 14
+      - name: Android API ${{ steps.config.outputs.label }} Smoke test
+        uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
+        id: smoke-test
+        timeout-minutes: 40
+        continue-on-error: true
+        with:
+          api-level: ${{ steps.config.outputs.api-level }}
+          target: ${{ steps.config.outputs.target }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: pwsh ./scripts/smoke-test-android.ps1 -IsIntegrationTest -WarnIfFlaky
+      - name: Upload artifacts on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: testapp-android-logs-${{ inputs.api-level }}-${{ inputs.unity-version }}-${{ inputs.try }}
+          path: ${{ env.ARTIFACTS_PATH }}
+          retention-days: 14
