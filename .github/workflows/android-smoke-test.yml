@@ -12,9 +12,9 @@ on:
         type: number
     # Map the workflow outputs to job outputs
     outputs:
-      outcome:
-        description:
-        value: ${{ jobs.run.outputs.outcome }}
+      status:
+        description: "The outcome status of the smoke test"
+        value: ${{ jobs.run.outputs.status }}
 
 jobs:
   run:

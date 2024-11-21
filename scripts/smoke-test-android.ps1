@@ -247,7 +247,7 @@ function ExitNow([string] $status, [string] $message)
 {
     if (Test-Path env:GITHUB_OUTPUT)
     {
-        Write-Host "Writing 'status=$status' to env:GITHUB_OUTPUT: ${env:GITHUB_OUTPUT}"
+        Write-Host "::warning::Writing 'status=$status' to env:GITHUB_OUTPUT: ${env:GITHUB_OUTPUT}"
         "status=$status" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
     }
     else
