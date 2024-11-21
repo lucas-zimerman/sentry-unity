@@ -61,7 +61,7 @@ else
     $ApkFileName = "IL2CPP_Player.apk"
     $ProcessName = "io.sentry.samples.unityofbugs"
 }
-$TestActivityName = "$ProcessName/com.unity3d.player.UnityPlayerGameActivity" # com.unity3d.player.UnityPlayerActivity                                
+$TestActivityName = "$ProcessName/com.unity3d.player.UnityPlayerGameActivity2" # com.unity3d.player.UnityPlayerActivity                                
 
 $_ArtifactsPath = ((Test-Path env:ARTIFACTS_PATH) ? $env:ARTIFACTS_PATH : "./$BuildDir/../test-artifacts/") `
     + $(Get-Date -Format "HHmmss")
@@ -247,7 +247,7 @@ function ExitNow([string] $status, [string] $message)
 {
     if (Test-Path env:GITHUB_OUTPUT)
     {
-        Write-Host "::warning::Writing 'status=$status' to env:GITHUB_OUTPUT: ${env:GITHUB_OUTPUT}"
+        Write-Host "Writing 'status=$status' to env:GITHUB_OUTPUT: ${env:GITHUB_OUTPUT}"
         "status=$status" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
     }
     else
