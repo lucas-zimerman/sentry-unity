@@ -88,6 +88,16 @@ jobs:
         shell: bash
         run: echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
 
+      - name: test
+        if: steps.avd-cache.outputs.cache-hit == 'true'
+        shell: bash
+        run: adb
+
+      - name: test2
+        if: steps.avd-cache.outputs.cache-hit == 'true'
+        run: adb
+
+
       - name: create Android Emulator Image
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
