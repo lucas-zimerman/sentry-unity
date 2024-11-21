@@ -1,6 +1,5 @@
 on:
   pull_request:
-
 jobs:
   run:
     name: try-${{ inputs.try }}
@@ -10,7 +9,7 @@ jobs:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
     defaults:
       run:
-        shell: pwsh
+        shell: pwsh        
     # Map the job outputs to step outputs
     outputs:
       outcome: ${{ steps.smoke-test.outcome }}
@@ -36,7 +35,7 @@ jobs:
         id: config
         run: |
           # Setup API Level
-          $apiLevel = '${{ inputs.api-level }}'
+          $apiLevel = '28'
           if ( $apiLevel -eq 'latest')
           {
             # Gets the latest API level that isn't in Beta/Alpha
