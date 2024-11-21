@@ -78,6 +78,7 @@ jobs:
         with:
           path: |
             ~/.android/avd/
+            ~/.android/adb*
             $ANDROID_SDK_ROOT/system-images/
             $ANDROID_SDK_ROOT/platform-tools/
           key: avd-${{ runner.os }}-${{ steps.config.outputs.api-level }}-${{ github.run_id }}-2
