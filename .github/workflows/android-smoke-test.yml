@@ -89,9 +89,9 @@ jobs:
         id: avd-cache
         with:
           path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ steps.config.outputs.api-level }}
+            ~/.android/avd/
+            $ANDROID_SDK_ROOT/system-images/
+          key: avd-${{ runner.os }}-${{ steps.config.outputs.api-level }}-${{ github.run_id }}
 
       - name: create Android Emulator Image
         if: steps.avd-cache.outputs.cache-hit != 'true'
