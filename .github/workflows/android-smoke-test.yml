@@ -69,6 +69,12 @@ jobs:
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@d0a116fff52a680bc1541b7c4c87ca37d30abf00
 
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+
       - name: AVD cache
         if: steps.avd-cache.outputs.cache-hit == '2'
         uses: actions/cache@v4
@@ -117,7 +123,7 @@ jobs:
               Start-Sleep -Seconds 5
               $retries++
           }
-          
+
       - name: Android API ${{ steps.config.outputs.label }} Smoke test
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
         id: smoke-test

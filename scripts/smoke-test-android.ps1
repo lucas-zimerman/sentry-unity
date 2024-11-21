@@ -77,7 +77,28 @@ function ArtifactsPath
 if (Test-Path env:CI)
 {
     # Take Screenshot of VM to verify emulator start
+    if ($IsMacOS)
+    {
+        screencapture "$(ArtifactsPath)/host-screenshot.jpg"
+    }
+    elseif ($IsLinux)
+    {
+        import -window root "$(ArtifactsPath)/host-screenshot.jpg"
+    }
+    else {
+        Write-Warning "Screenshot functionality is not implemented for this platform."
+    }
+}
+
+if ($IsMacOS -and (Test-Path env:CI))
+{
+    # Take Screenshot of VM to verify emulator start
     screencapture "$(ArtifactsPath)/host-screenshot.jpg"
+}
+elseif ($IsLinux -and (Test-Path env:CI))
+{
+    # Take Screenshot of VM to verify emulator start (Linux)
+    import -window root "$(ArtifactsPath)/host-screenshot.jpg"
 }
 
 function TakeScreenshot([string] $deviceId)
