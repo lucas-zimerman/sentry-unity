@@ -20,7 +20,7 @@ jobs:
     needs: try-1
     steps:
       - name: Get status from smoke test workflow
-        run: echo "The status from the smoke test is ${{ needs.try-1.outputs.status }}" or ${{ try-1.outputs.status }}"
+        run: echo "The status from the smoke test is ${{ needs.try-1.outputs.status }} or ${{ try-1.outputs.status }}"
 
   try-2:
     needs: [try-1]
