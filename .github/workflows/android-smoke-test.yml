@@ -28,7 +28,7 @@ jobs:
         shell: pwsh        
     # Map the job outputs to step outputs
     outputs:
-      status: ${{ steps.my-step.outputs.status }}
+      status: ${{ steps.smoke-test.outputs.status }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -141,6 +141,7 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: pwsh ./scripts/smoke-test-android.ps1 -IsIntegrationTest -WarnIfFlaky
+
       - name: Upload artifacts on failure
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
