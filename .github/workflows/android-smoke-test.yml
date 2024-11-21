@@ -105,6 +105,7 @@ jobs:
             echo "Generated AVD snapshot for caching."
 
       - name: Wait for Emulator to Close
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         env:
           EMULATOR_NAME: emulator-5554 # Replace with your emulator ID
         run: |
