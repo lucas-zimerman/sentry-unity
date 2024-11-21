@@ -28,15 +28,15 @@ jobs:
         shell: pwsh        
     # Map the job outputs to step outputs
     outputs:
-      status: ${{ steps.my-step.status }}
+      status: ${{ steps.my-step.outputs.status }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: test
         id: my-step
         run: |
-          "status=failure" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "status=failure" >> $env:GITHUB_OUTPUT
 
       # Not required for MacOS.
       - name: Enable KVM group perms
