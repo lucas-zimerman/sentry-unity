@@ -1,5 +1,6 @@
 on:
   pull_request:
+
 jobs:
   run:
     name: try-${{ inputs.try }}
@@ -52,7 +53,7 @@ jobs:
           # Setup Arch and Target
           $target = $apiLevel -ge 30 ? 'google_apis' : 'default'
           Write-Output "Current Target is $target"
-          # "target=$target" >> $env:GITHUB_OUTPUT
+          "target=$target" >> $env:GITHUB_OUTPUT
           "api-level=$apiLevel" >> $env:GITHUB_OUTPUT
           "label=$($label ?? $apiLevel)" >> $env:GITHUB_OUTPUT
 
@@ -83,6 +84,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
         with:
           api-level: ${{ steps.config.outputs.api-level }}
+          target: ${{ steps.config.outputs.target }}
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -93,6 +95,17 @@ jobs:
             adb devices -l
             # gradle connectedAndroidTest --continue
             echo "Generated AVD snapshot for caching."
+
+      - name: Wait for Emulator to Close
+        env:
+          EMULATOR_NAME: emulator-5554 # Replace with your emulator ID
+        run: |
+          echo "Waiting for emulator $EMULATOR_NAME to close..."
+          until ! adb devices | grep -q "$EMULATOR_NAME"; do
+            echo "Emulator $EMULATOR_NAME is still running. Retrying in 5 seconds..."
+            sleep 5
+          done
+          echo "Emulator $EMULATOR_NAME is offline."
       - name: Android API ${{ steps.config.outputs.label }} Smoke test
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
         id: smoke-test
