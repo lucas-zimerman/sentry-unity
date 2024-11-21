@@ -100,13 +100,24 @@ jobs:
         env:
           EMULATOR_NAME: emulator-5554 # Replace with your emulator ID
         run: |
-          echo "Waiting for emulator $EMULATOR_NAME to close..."
-          until ! adb devices | grep -q "$EMULATOR_NAME"; do
-            echo "Emulator $EMULATOR_NAME is still running. Retrying in 5 seconds..."
-            sleep 5
-          done
-          echo "Emulator $EMULATOR_NAME is offline."
-
+          Write-Output "Waiting for emulator $env:EMULATOR_NAME to close..."
+          $retries = 0
+          $maxRetries = 60 # Adjust timeout (60 x 5 seconds = 5 minutes)
+          while ($true) {
+              $devices = adb devices | Select-String -Pattern $env:EMULATOR_NAME
+              if (-not $devices) {
+                  Write-Output "Emulator $env:EMULATOR_NAME is offline."
+                  break
+              }
+              if ($retries -ge $maxRetries) {
+                  Write-Error "Timeout: Emulator $env:EMULATOR_NAME did not go offline after $(($maxRetries * 5)) seconds."
+                  exit 1
+              }
+              Write-Output "Emulator $env:EMULATOR_NAME is still running. Retrying in 5 seconds... ($retries/$maxRetries)"
+              Start-Sleep -Seconds 5
+              $retries++
+          }
+          
       - name: Android API ${{ steps.config.outputs.label }} Smoke test
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
         id: smoke-test
