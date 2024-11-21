@@ -85,15 +85,6 @@ jobs:
 #        shell: bash
 #        run: echo "~/.android/adb" >> $GITHUB_PATH
 
-      - name: test
-        if: steps.avd-cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: adb
-
-      - name: test2
-        if: steps.avd-cache.outputs.cache-hit == 'true'
-        run: adb
-
 
       - name: create Android Emulator Image
         if: steps.avd-cache.outputs.cache-hit != 'true'
