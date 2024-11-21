@@ -78,15 +78,12 @@ jobs:
         with:
           path: |
             ~/.android/avd/
-            ~/.android/adb*
-            $ANDROID_SDK_ROOT/system-images/
-            $ANDROID_SDK_ROOT/platform-tools/
           key: avd-${{ runner.os }}-${{ steps.config.outputs.api-level }}-${{ github.run_id }}-2
 
-      - name: recover ADB PATH
-        if: steps.avd-cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: echo "~/.android/adb" >> $GITHUB_PATH
+#      - name: recover ADB PATH
+#        if: steps.avd-cache.outputs.cache-hit == 'true'
+#        shell: bash
+#        run: echo "~/.android/adb" >> $GITHUB_PATH
 
       - name: test
         if: steps.avd-cache.outputs.cache-hit == 'true'
@@ -113,6 +110,7 @@ jobs:
             adb shell input keyevent 82
             adb devices -l
             # gradle connectedAndroidTest --continue
+            ls ~/.android/avd
             echo "Generated AVD snapshot for caching."
 
       - name: Wait for Emulator to Close
