@@ -106,6 +106,7 @@ jobs:
             sleep 5
           done
           echo "Emulator $EMULATOR_NAME is offline."
+
       - name: Android API ${{ steps.config.outputs.label }} Smoke test
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
         id: smoke-test
