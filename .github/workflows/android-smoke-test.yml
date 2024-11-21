@@ -1,5 +1,21 @@
 on:
   workflow_call:
+    inputs:
+      unity-version:
+        required: true
+        type: string
+      api-level:
+        required: true
+        type: string
+      try:
+        required: true
+        type: number
+    # Map the workflow outputs to job outputs
+    outputs:
+      outcome:
+        description:
+        value: ${{ jobs.run.outputs.outcome }}
+
 jobs:
   run:
     name: try-${{ inputs.try }}
