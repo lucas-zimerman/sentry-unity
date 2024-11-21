@@ -72,22 +72,7 @@ jobs:
           "api-level=$apiLevel" >> $env:GITHUB_OUTPUT
           "label=$($label ?? $apiLevel)" >> $env:GITHUB_OUTPUT
 
-      - name: AVD cache
-        uses: actions/cache@v4
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/
-          key: avd-${{ runner.os }}-${{ steps.config.outputs.api-level }}-${{ github.run_id }}-2
-
-#      - name: recover ADB PATH
-#        if: steps.avd-cache.outputs.cache-hit == 'true'
-#        shell: bash
-#        run: echo "~/.android/adb" >> $GITHUB_PATH
-
-
       - name: create Android Emulator Image
-        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
         with:
           api-level: ${{ steps.config.outputs.api-level }}
@@ -105,7 +90,6 @@ jobs:
             echo "Generated AVD snapshot for caching."
 
       - name: Wait for Emulator to Close
-        if: steps.avd-cache.outputs.cache-hit != 'true'
         env:
           EMULATOR_NAME: emulator-5554 # Replace with your emulator ID
         run: |

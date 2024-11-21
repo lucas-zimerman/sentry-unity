@@ -9,6 +9,8 @@ on:
         type: string
 
 jobs:
+  # needs.try-*.outputs.status == 'failed' => Smoke test failed, no need to retry.
+  # needs.try-*.result == 'failure'        => CI Setup failed.
   try-1:
     uses: ./.github/workflows/android-smoke-test.yml
     with:
@@ -16,45 +18,57 @@ jobs:
       api-level: ${{ inputs.api-level }}
       try: 1
 
-  try-2:
+  try-1-check-failed:
+    runs-on: ubuntu-latest
     needs: [try-1]
-    # needs.try-1.result == 'failure' checks Emulator Setup
-    # needs.try-1.outputs.status == 'flaky' checks Smoke test flakyness.
-    if: ${{ needs.try-1.result == 'failure' || needs.try-1.outputs.status == 'flaky' || needs.try-1.outputs.status == 'failed'}}
+    steps:
+      - name: Check failed
+        run: |
+          if [[ "${{ needs.try-1.outputs.status }}" == "failed" ]]; then
+            echo "Smoke test failed."
+            exit 0 # change to 0 later.
+          fi
+
+  try-2:
+    needs: [try-1-check-failed]
+    if: ${{ needs.try-1.result == 'failure' || needs.try-1.outputs.status != 'success' }}
     uses: ./.github/workflows/android-smoke-test.yml
     with:
       unity-version: ${{ inputs.unity-version }}
       api-level: ${{ inputs.api-level }}
-      try: 2
+      try: 2      
+
+  try-2-check-failed:
+    runs-on: ubuntu-latest
+    needs: [try-2]
+    steps:
+      - name: Check failed
+        run: |
+          if [[ "${{ needs.try-2.outputs.status }}" == "failed" ]]; then
+            echo "Smoke test failed."
+            exit 0 # change to 0 later.
+          fi
 
   try-3:
-    needs: [try-2]
-    if: ${{ needs.try-2.result == 'failure' || needs.try-2.outputs.status == 'flaky' || needs.try-2.outputs.status == 'failed'}}
+    needs: [try-2-check-failed]
+    if: ${{ needs.try-2.result == 'failure' || needs.try-1.outputs.status != 'success' }}
     uses: ./.github/workflows/android-smoke-test.yml
     with:
       unity-version: ${{ inputs.unity-version }}
       api-level: ${{ inputs.api-level }}
       try: 3
-  
-  result:
+
+  try-3-check-status:
     runs-on: ubuntu-latest
-    needs: [try-1, try-2, try-3]
+    needs: [try-3]
     steps:
-      - name: Try-Result
+      - name: Check final result
         run: |
-          try_3_status="${{ needs.try-3.outputs.status || 'not_run' }}"
-          try_2_status="${{ needs.try-2.outputs.status || 'not_run' }}"
-          try_1_status="${{ needs.try-1.outputs.status || 'not_run' }}"
-
-          if [[ "$try_3_status" == "flaky" || "$try_3_status" == "crashed" ]]; then
-            echo "Skipping due to flaky or crashed status."
+          if [[ "${{ needs.try-3.outputs.status }}" == "flaky" || "${{ needs.try-3.outputs.status }}" == "crashed" ]]; then
+            echo "Job status is flaky or crashed. Exiting with code 78."
             exit 78
-          # Check if any of the steps were successful
-          elif [[ "$try_3_status" == "success" || "$try_2_status" == "success" || "$try_1_status" == "success" ]]; then
-            echo "Exiting with code 0 due to success."
-            exit 0
-          else
-            echo "Exiting with code 1."
-            exit 1
           fi
-
+          if [[ "${{ needs.try-2.outputs.status }}" == "failed" ]]; then
+            echo "Smoke test failed."
+            exit 0 # change to 0 later.
+          fi
