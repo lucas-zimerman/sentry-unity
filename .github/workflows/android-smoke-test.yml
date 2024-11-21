@@ -66,8 +66,8 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
 
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@d0a116fff52a680bc1541b7c4c87ca37d30abf00
+#      - name: Gradle cache
+#        uses: gradle/actions/setup-gradle@d0a116fff52a680bc1541b7c4c87ca37d30abf00
 
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
