@@ -25,7 +25,7 @@ jobs:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
     defaults:
       run:
-        shell: bash        
+        shell: pwsh        
     # Map the job outputs to step outputs
     outputs:
       status: ${{ steps.my-step.status }}
@@ -36,7 +36,7 @@ jobs:
       - name: test
         id: my-step
         run: |
-          echo "status=success" >> $GITHUB_OUTPUT
+          "status=failure" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       # Not required for MacOS.
       - name: Enable KVM group perms
