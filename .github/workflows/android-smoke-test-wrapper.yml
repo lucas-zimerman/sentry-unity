@@ -46,10 +46,11 @@ jobs:
           try_2_status="${{ needs.try-2.outputs.status || 'not_run' }}"
           try_1_status="${{ needs.try-1.outputs.status || 'not_run' }}"
 
-          if [[ "${{ try_3_status }}" == "flaky" || "${{ try_2_status }}" == "crashed" ]]; then
+          if [[ "$try_3_status" == "flaky" || "$try_3_status" == "crashed" ]]; then
             echo "Skipping due to flaky or crashed status."
             exit 78
-          elif [[ "${{ try_3_status }}" == "success" || "${{ try_2_status }}" == "success" || "${{ try_1_status }}" == "success" ]]; then
+          # Check if any of the steps were successful
+          elif [[ "$try_3_status" == "success" || "$try_2_status" == "success" || "$try_1_status" == "success" ]]; then
             echo "Exiting with code 0 due to success."
             exit 0
           else
