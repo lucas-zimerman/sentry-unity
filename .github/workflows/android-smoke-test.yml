@@ -40,11 +40,11 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-#      - name: Download test app artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: testapp-Android-compiled-${{ inputs.unity-version }}
-#          path: samples/IntegrationTest/Build
+      - name: Download test app artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: testapp-Android-compiled-${{ inputs.unity-version }}
+          path: samples/IntegrationTest/Build
 
       # outputs variables: api-level, label, target
       - name: Configure Android Settings
@@ -88,6 +88,7 @@ jobs:
           path: |
             ~/.android/avd/
             $ANDROID_SDK_ROOT/system-images/
+            $ANDROID_SDK_ROOT/platform-tools/
           key: avd-${{ runner.os }}-${{ steps.config.outputs.api-level }}-${{ github.run_id }}
 
       - name: create Android Emulator Image
