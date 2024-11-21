@@ -91,7 +91,7 @@ jobs:
             adb wait-for-device
             adb shell input keyevent 82
             adb devices -l
-            gradle connectedAndroidTest --continue
+            # gradle connectedAndroidTest --continue
             echo "Generated AVD snapshot for caching."
       - name: Android API ${{ steps.config.outputs.label }} Smoke test
         uses: reactivecircus/android-emulator-runner@d94c3fbe4fe6a29e4a5ba47c12fb47677c73656b # pin@v233.0
