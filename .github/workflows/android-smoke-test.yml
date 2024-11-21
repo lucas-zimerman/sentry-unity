@@ -25,20 +25,20 @@ jobs:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
     defaults:
       run:
-        shell: pwsh        
+        shell: bash        
     # Map the job outputs to step outputs
     outputs:
       status: ${{ steps.my-step.status }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - id: my-step
         run: |
           echo "status=success" >> $GITHUB_OUTPUT
 
       # Not required for MacOS.
       - name: Enable KVM group perms
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -52,6 +52,7 @@ jobs:
 
       # outputs variables: api-level, label, target
       - name: Configure Android Settings
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         id: config
         run: |
           # Setup API Level
