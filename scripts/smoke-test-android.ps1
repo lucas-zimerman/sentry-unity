@@ -367,8 +367,6 @@ foreach ($device in $DeviceList)
             else
             {
                 Write-Host "Activity started successfully."
-                ExitNow "failed" "Test Activity does not exist"            
-
             }
         } else {
             Write-Host "Activity started successfully."
