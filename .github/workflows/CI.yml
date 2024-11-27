@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+  workflow_dispatch: # e.g. to manually trigger on foreign PRs
+
+env:
+  LOWEST_SUPPORTED_UNITY_VERSION: 2019
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  cancel-previous-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@b173b6ec0100793626c2d9e6b90435061f4fc3e5 # pin@0.11.0
+        with:
+          access_token: ${{ github.token }}
+  build:
+    name: Build - ${{ matrix.unity-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Building the SDK with Unity 2022 and newer requires ns2.1 - skipping for now
+        unity-version: ["2021"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Load env
+        id: env
+        run: echo "unityVersion=$(./scripts/ci-env.ps1 "unity${{ matrix.unity-version }}")" >> $env:GITHUB_OUTPUT
+
+      - run: echo "::add-mask::${{ secrets.LICENSE_SERVER_URL }}"
+
+
+  # This produces the `samples/IntegrationTest` as `smoke-test-${{ matrix.unity-version }}`.
+
+  android-smoke-test-run:
+    name: ${{ matrix.unity-version }} Android ${{ matrix.api-level }} Run Smoke Test
+    uses: ./.github/workflows/android-smoke-test-wrapper.yml
+    with:
+      unity-version: ${{ matrix.unity-version }}
+      api-level: ${{ matrix.api-level }}
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [28] # last updated October 2022
+        unity-version: ["6000"]
+        include:
+          # API 21 is barely used but let's check it as the minimum supported version for now.
+          - api-level: 21
+            unity-version: "2019"
+        exclude:
+          # Seems like there's an error in Unity with Android API 30 - disabling.
+          # https://github.com/getsentry/sentry-unity/issues/719#issuecomment-1129129952
+          - api-level: 30
+            unity-version: "2021"
+          - api-level: 30
+            unity-version: "2022"
