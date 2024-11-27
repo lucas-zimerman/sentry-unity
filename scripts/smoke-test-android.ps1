@@ -357,7 +357,6 @@ foreach ($device in $DeviceList)
         Write-Host "Starting app $TestActivityName"
         $output = & adb -s $device shell am start -n $TestActivityName -e test $Name 2>&1
         if ($output -match "Error type 3" -or $output -match "Activity class \{$TestActivityName\} does not exist.") {
-            ExitNow "failed" "Activity does not exist"            
 
             Write-Host "Trying fallback activity $FallBackTestActivityName"
             $output = & adb -s $device shell am start -n $FallBackTestActivityName -e test $Name 2>&1
